@@ -19,38 +19,52 @@ export const DiagnosticsCore = webComponent(
         console.warn("canvas is ready but state is not available");
         return;
       }
-      console.log("canvasReady", refs);
+
+      // Set the canvas information string:
+      const canvas = refs.canvas;
+      if (!(canvas instanceof HTMLCanvasElement)) {
+        console.warn("Canvas reference must be a valid HTMLCanvasElement");
+        return;
+      }
+
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio;
+      const w = canvas.width;
+      const h = canvas.height;
+      const info = `CSS: ${Math.floor(rect.width)}×${
+        Math.floor(rect.height)
+      }px | Canvas: ${w}×${h}px | DPR: ${dpr}`;
+
+      mutable.canvasInfo = info;
+
       webgpuInit(mutable).then(() => {
-        const canvas = refs.canvas;
-        if (canvas instanceof HTMLCanvasElement) {
-          // const { width, height } = canvas.getBoundingClientRect();
-          const context = canvas.getContext("webgpu");
-          if (!context) {
-            throw new Error("Could not get WebGPU context from canvas.");
-          }
-
-          const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
-          context.configure({
-            device: mutable[runtimeAttribute].device,
-            format: canvasFormat,
-          });
-
-          mutable[runtimeAttribute].context = context;
-
-          console.log("creating pipelines");
-          // Create the pipelines
-          createComputeAndRenderPipeline(
-            mutable[runtimeAttribute].device,
-            mutable[runtimeAttribute].context,
-            canvasFormat,
-            getComputeShader(),
-            getVertexShader(),
-            getFragmentShader(),
-          ).then((pipelines) => {
-            console.log("Rendering");
-            pipelines.render();
-          });
+        // const { width, height } = canvas.getBoundingClientRect();
+        const context = canvas.getContext("webgpu");
+        if (!context) {
+          throw new Error("Could not get WebGPU context from canvas.");
         }
+
+        const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
+        context.configure({
+          device: mutable[runtimeAttribute].device,
+          format: canvasFormat,
+        });
+
+        mutable[runtimeAttribute].context = context;
+        // Set the webgpu as green:
+        mutable.isWebGPUSupported = true;
+
+        // Create the pipelines
+        createComputeAndRenderPipeline(
+          mutable[runtimeAttribute].device,
+          mutable[runtimeAttribute].context,
+          canvasFormat,
+          getComputeShader(),
+          getVertexShader(),
+          getFragmentShader(),
+        ).then((pipelines) => {
+          pipelines.render();
+        });
       });
     });
 

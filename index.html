@@ -9,11 +9,23 @@
   <link rel="stylesheet" type="text/css" href="/root.css" />
   <!-- The main entry point of the web app JS code -->
   <script src="./main.js" type="module"></script>
+  <style>
+.wrap {
+  max-width: 1000px;
+  margin-inline:auto;
+  padding: 16px clamp(14px, 2vw, 24px);
+}
+  </style>
 </head>
 
 <body>
   <diagnostics-header></diagnostics-header>
-  <diagnostics-core></diagnostics-core>
-  <color-panel></color-panel>
+  <main class="wrap">
+    <diagnostics-panel-canvas></diagnostics-panel-canvas>
+
+    <diagnostics-grid></diagnostics-grid>
+  </main>
+
+  <!-- <color-panel></color-panel> -->
 </body>
 </html>

@@ -1,9 +1,9 @@
 <template data-component="diagnostics-header">
   <div class="wrap titlebar">
     <h1>WebGPU Diagnostics</h1>
-    <div id="status" class="badge">
+    <div id="status" class="badge" data-ref="badge">
       <span class="dot"></span>
-      <slot name="status-text">
+      <slot name="statusText">
         Initializing...
       </slot>
     </div>

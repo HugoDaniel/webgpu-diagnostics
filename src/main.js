@@ -5,9 +5,6 @@ import { getComputeShader } from "./getComputeShader.js";
 import { getFragmentShader } from "./getFragmentShader.js";
 import { getVertexShader } from "./getVertexShader.js";
 import { runtimeAttribute } from "./runtimeAttribute.js";
-import { webgpuInit } from "./webgpuInit.js";
-
-let uiState;
 
 /** @type UIState */
 const initialUIState = {
@@ -28,6 +25,7 @@ const initialUIState = {
     adapter: {},
     device: {},
   },
+  canvasInfo: "-",
   shaders: {
     compute: getComputeShader(),
     vertex: getVertexShader(),
@@ -49,6 +47,7 @@ const initialUIState = {
   },
 };
 
-uiState = await inflictBoreDOM(initialUIState);
-
-console.log("ui state: ", JSON.parse(JSON.stringify(uiState)));
+window.addEventListener("DOMContentLoaded", async () => {
+  const uiState = await inflictBoreDOM(initialUIState);
+  console.log("ui state: ", JSON.parse(JSON.stringify(uiState)));
+});
