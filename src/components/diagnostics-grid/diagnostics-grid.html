@@ -2,17 +2,56 @@
     <section class="grid mt">
       <article class="panel card" data-ref="timingsCard">
         <h3>Timings</h3>
-        <div class="list" data-ref="timings"></div>
+        <ul class="list">
+          <li class="row">
+            <span>Adapter request</span>
+            <slot name="adapterRequest" class="val"></slot>
+          </li>
+          <li class="row">
+            <span>Device request</span>
+            <slot name="deviceRequest" class="val"></slot>
+          </li>
+          <li class="row">
+            <span>Compute Pipeline creation</span>
+            <slot name="computePipelineCreation" class="val"></slot>
+          </li>
+          <li class="row">
+            <span>Render Pipeline creation</span>
+            <slot name="renderPipelineCreation" class="val"></slot>
+          </li>
+          <li class="row">
+            <span>Compute Shader compilation</span>
+            <slot name="computeShaderCompilation" class="val"></slot>
+          </li>
+          <li class="row">
+            <span>Vertex Shader compilation</span>
+            <slot name="vertexShaderCompilation" class="val"></slot>
+          </li>
+          <li class="row">
+            <span>Fragment Shader compilation</span>
+            <slot name="fragmentShaderCompilation" class="val"></slot>
+          </li>
+        </ul>
       </article>
 
       <article class="panel card" data-ref="featuresCard">
         <h3>Features</h3>
-        <div class="tags" data-ref="features"></div>
+        <slot class="tags" name="features">
+        </slot>
       </article>
 
       <article class="panel card" data-ref="adapterInfoCard">
         <h3>Adapter Info</h3>
-        <div class="list" data-ref="adapterInfo"></div>
+        <ul class="list">
+          <li class="row">
+            <span>Architecture</span>
+            <slot name="architecture" class="val"></slot>
+          </li>
+          <li class="row">
+            <span>Vendor</span>
+            <slot name="vendor" class="val"></slot>
+          </li>
+        </ul>
       </article>
 
       <article class="panel card" data-ref="warningsCard" hidden>

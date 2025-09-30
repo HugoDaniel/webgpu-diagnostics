@@ -37,7 +37,7 @@ export const DiagnosticsCore = webComponent(
 
       mutable.canvasInfo = info;
 
-      webgpuInit(mutable).then(() => {
+      webgpuInit(mutable).then(({ adapterInfo }) => {
         // const { width, height } = canvas.getBoundingClientRect();
         const context = canvas.getContext("webgpu");
         if (!context) {
@@ -54,6 +54,9 @@ export const DiagnosticsCore = webComponent(
         // Set the webgpu as green:
         mutable.isWebGPUSupported = true;
 
+        mutable.adapterInfo.architecture = String(adapterInfo.architecture);
+        mutable.adapterInfo.vendor = String(adapterInfo.vendor);
+
         // Create the pipelines
         createComputeAndRenderPipeline(
           mutable[runtimeAttribute].device,
@@ -63,6 +66,10 @@ export const DiagnosticsCore = webComponent(
           getVertexShader(),
           getFragmentShader(),
         ).then((pipelines) => {
+          // Update the timings:
+          for (const k in pipelines.timings) {
+            mutable.timings[k] = pipelines.timings[k];
+          }
           pipelines.render();
         });
       });

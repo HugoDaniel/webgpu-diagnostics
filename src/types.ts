@@ -14,6 +14,11 @@ export type UIState = {
     vertexShaderCompilation: number;
     fragmentShaderCompilation: number;
   };
+  adapterInfo: {
+    architecture: string;
+    vendor: string;
+  };
+  adapterFeatures: string[];
   canvasInfo: string;
   limits: {
     adapter: Partial<GPUSupportedLimits>;

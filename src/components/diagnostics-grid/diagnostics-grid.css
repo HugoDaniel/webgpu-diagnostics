@@ -18,11 +18,21 @@
     margin:0 0 10px; font-size: clamp(14px, 1.2vw + 10px, 16px);
     font-weight:600;
   }
-  .list{display:flex; flex-direction:column; gap:8px}
+  .list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding: 0;
+  }
   .row{
-    display:flex; align-items:center; justify-content:space-between;
-    gap:12px; font-size:13px; color:var(--muted);
-    padding:6px 0; border-bottom:1px dashed color-mix(in oklab, var(--border) 70%, transparent);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    font-size:13px;
+    color:var(--muted);
+    padding:6px 0;
+    border-bottom:1px dashed color-mix(in oklab, var(--border) 70%, transparent);
   }
   .row:last-child{border-bottom:0}
   .val{color:var(--text); font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}

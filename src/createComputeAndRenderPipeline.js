@@ -15,19 +15,44 @@ export async function createComputeAndRenderPipeline(
   vertexShaderCode,
   fragmentShaderCode,
 ) {
+  const timings = {
+    renderPipelineCreation: 0,
+    computePipelineCreation: 0,
+    computeShaderCompilation: 0,
+    vertexShaderCompilation: 0,
+    fragmentShaderCompilation: 0,
+  };
   // ============================================
   // 1. Create shader modules
   // ============================================
 
+  const computeShaderStart = performance.now();
   const computeShaderModule = device.createShaderModule({
     label: "Compute shader",
     code: computeShaderCode,
   });
+  await computeShaderModule.getCompilationInfo();
+  timings.computeShaderCompilation = performance.now() - computeShaderStart;
 
-  const renderShaderModule = device.createShaderModule({
-    label: "Vertex and Fragment shaders",
-    code: vertexShaderCode + "\n" + fragmentShaderCode,
+  // const renderShaderModule = device.createShaderModule({
+  //   label: "Vertex and Fragment shaders",
+  //   code: vertexShaderCode + "\n" + fragmentShaderCode,
+  // });
+  const vertexShaderStart = performance.now();
+  const vertexShaderModule = device.createShaderModule({
+    label: "Vertex shader",
+    code: vertexShaderCode,
   });
+  await vertexShaderModule.getCompilationInfo();
+  timings.vertexShaderCompilation = performance.now() - vertexShaderStart;
+
+  const fragmentShaderStart = performance.now();
+  const fragmentShaderModule = device.createShaderModule({
+    label: "Fragment shader",
+    code: fragmentShaderCode,
+  });
+  await fragmentShaderModule.getCompilationInfo();
+  timings.fragmentShaderCompilation = performance.now() - fragmentShaderStart;
 
   // ============================================
   // 2. Create storage buffer for vertices
@@ -104,14 +129,30 @@ export async function createComputeAndRenderPipeline(
     bindGroupLayouts: [computeBindGroupLayout],
   });
 
-  const computePipeline = device.createComputePipeline({
-    label: "Compute pipeline",
-    layout: computePipelineLayout,
-    compute: {
-      module: computeShaderModule,
-      entryPoint: "compute_main",
-    },
-  });
+  const computePipelineStart = performance.now();
+  /** @type {GPUComputePipeline} */
+  let computePipeline;
+  if (typeof device.createComputePipelineAsync === "function") {
+    computePipeline = await device.createComputePipelineAsync({
+      label: "Compute pipeline",
+      layout: computePipelineLayout,
+      compute: {
+        module: computeShaderModule,
+        entryPoint: "compute_main",
+      },
+    });
+  } else {
+    // Fallback for browsers without the async pipeline API.
+    computePipeline = device.createComputePipeline({
+      label: "Compute pipeline",
+      layout: computePipelineLayout,
+      compute: {
+        module: computeShaderModule,
+        entryPoint: "compute_main",
+      },
+    });
+  }
+  timings.computePipelineCreation = performance.now() - computePipelineStart;
 
   // ============================================
   // 6. Create render pipeline
@@ -122,17 +163,20 @@ export async function createComputeAndRenderPipeline(
     bindGroupLayouts: [renderBindGroupLayout],
   });
 
-  const renderPipeline = device.createRenderPipeline({
+  const renderPipelineStart = performance.now();
+  /** @type {GPURenderPipeline} */
+  let renderPipeline;
+  const renderPipelineDescriptor = /** @type {GPURenderPipelineDescriptor} */ ({
     label: "Render pipeline",
     layout: renderPipelineLayout,
     vertex: {
-      module: renderShaderModule,
+      module: vertexShaderModule,
       entryPoint: "vertex_main",
       // No vertex buffers needed - we read from storage buffer
       buffers: [],
     },
     fragment: {
-      module: renderShaderModule,
+      module: fragmentShaderModule,
       entryPoint: "fragment_main",
       targets: [{
         format: format,
@@ -163,6 +207,13 @@ export async function createComputeAndRenderPipeline(
     // },
   });
 
+  if (typeof device.createRenderPipelineAsync === "function") {
+    renderPipeline = await device.createRenderPipelineAsync(renderPipelineDescriptor);
+  } else {
+    renderPipeline = device.createRenderPipeline(renderPipelineDescriptor);
+  }
+  timings.renderPipelineCreation = performance.now() - renderPipelineStart;
+
   // ============================================
   // 7. Create render pass descriptor
   // ============================================
@@ -171,7 +222,7 @@ export async function createComputeAndRenderPipeline(
     label: "Main render pass",
     colorAttachments: [{
       view: null, // Will be set each frame
-      clearValue: { r: 0.1, g: 0.1, b: 0.1, a: 1.0 },
+      clearValue: { r: 0.9, g: 0.8, b: 0.7, a: 1.0 },
       loadOp: "clear",
       storeOp: "store",
     }],
@@ -229,5 +280,6 @@ export async function createComputeAndRenderPipeline(
     vertexBuffer,
     computeBindGroup,
     renderBindGroup,
+    timings,
   };
 }

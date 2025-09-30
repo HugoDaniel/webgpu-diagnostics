@@ -21,6 +21,11 @@ const initialUIState = {
     vertexShaderCompilation: 0,
     fragmentShaderCompilation: 0,
   },
+  adapterInfo: {
+    architecture: "-",
+    vendor: "-",
+  },
+  adapterFeatures: [],
   limits: {
     adapter: {},
     device: {},
@@ -31,8 +36,6 @@ const initialUIState = {
     vertex: getVertexShader(),
     fragment: getFragmentShader(),
   },
-  // @ts-expect-error
-  features: undefined,
   errors: {
     adapter: [],
     device: [],

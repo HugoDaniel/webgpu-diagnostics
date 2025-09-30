@@ -1,10 +1,17 @@
 // @ts-check
+/** @typedef {import("./types.ts").UIState} UIState */
 import { runtimeAttribute } from "./runtimeAttribute.js";
-import { getFeaturesList } from "./getFeatureList.js";
 import { extractLimits } from "./extractLimits.js";
 
+/**
+ * Initialize WebGPU and surface adapter metadata.
+ * @param {UIState} uiState
+ * @returns {Promise<{ adapterInfo: GPUAdapterInfo | null }>}
+ */
 export async function webgpuInit(uiState) {
   console.log("STATE:", uiState);
+  /** @type {GPUAdapterInfo | null} */
+  let adapterInfo = null;
   // Try to get the WebGPU adapter
   try {
     // 1. Request Adapter
@@ -13,7 +20,9 @@ export async function webgpuInit(uiState) {
       powerPreference: "high-performance",
       forceFallbackAdapter: false,
     }).catch((err) => {
-      uiState.errors.adapter.push(err);
+      uiState.errors.adapter.push(
+        err instanceof Error ? err.message : String(err),
+      );
       throw new Error("Failed to request WebGPU adapter");
     });
 
@@ -22,11 +31,16 @@ export async function webgpuInit(uiState) {
     }
     uiState.timings.adapterRequest = performance.now() - adapterStart;
     uiState[runtimeAttribute].adapter = adapter;
-    uiState[runtimeAttribute].features = getFeaturesList(adapter);
     uiState.limits.adapter = extractLimits(adapter.limits);
+    uiState.adapterFeatures.push(...adapter.features);
+    uiState.adapterFeatures.sort((a, b) => a.localeCompare(b));
+
+    adapterInfo = adapter.info;
   } catch (err) {
     console.error(err);
-    uiState.errors.adapter.push(err);
+    uiState.errors.adapter.push(
+      err instanceof Error ? err.message : String(err),
+    );
     throw new Error("Unknown error when requesting GPUAdapter");
   }
 
@@ -35,27 +49,31 @@ export async function webgpuInit(uiState) {
     const adapter = uiState[runtimeAttribute].adapter;
     // 2. Request Device with selected features
     const deviceStart = performance.now();
+
     console.log("LIMITS", uiState.limits.adapter, uiState);
+    const adapterLimits = uiState.limits.adapter;
     const device = await adapter.requestDevice({
       requiredFeatures: [],
       requiredLimits: {
         maxTextureDimension2D: Math.min(
           8192,
-          uiState.limits.adapter.maxTextureDimension2D,
+          adapterLimits.maxTextureDimension2D ?? 8192,
         ),
         maxBufferSize: Math.min(
           268435456,
-          uiState.limits.adapter.maxBufferSize,
+          adapterLimits.maxBufferSize ?? 268435456,
         ),
-        maxVertexBuffers: Math.min(8, uiState.limits.adapter.maxVertexBuffers),
+        maxVertexBuffers: Math.min(8, adapterLimits.maxVertexBuffers ?? 8),
         maxVertexAttributes: Math.min(
           16,
-          uiState.limits.adapter.maxVertexAttributes,
+          adapterLimits.maxVertexAttributes ?? 16,
         ),
       },
       label: "Main Device",
     }).catch((err) => {
-      uiState.errors.device.push(err);
+      uiState.errors.device.push(
+        err instanceof Error ? err.message : String(err),
+      );
       throw new Error("Failed to create WebGPU device");
     });
 
@@ -67,23 +85,24 @@ export async function webgpuInit(uiState) {
     device.addEventListener("uncapturederror", (event) => {
       const error = event.error;
 
-      uiState.errors.device.push({
-        message: error.message,
-        type: error.constructor.name,
-      });
+      uiState.errors.device.push(
+        `${error.constructor.name}: ${error.message}`,
+      );
     });
 
     device.lost.then((info) => {
       uiState.errors.device.push(
-        {
-          message: info.message || "Device was lost",
-          reason: info.reason,
-        },
+        `${info.reason}: ${info.message || "Device was lost"}`,
       );
     });
   } catch (err) {
-    uiState.errors.device.push(err);
+    uiState.errors.device.push(
+      err instanceof Error ? err.message : String(err),
+    );
     console.log(err);
     throw new Error("Unknown error when requesting GPUDevice");
   }
+
+  console.log("INFO:", adapterInfo);
+  return { adapterInfo };
 }
