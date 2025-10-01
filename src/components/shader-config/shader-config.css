@@ -1,0 +1,56 @@
+:where(shader-config) {
+  .tab-container {
+    max-width: 600px;
+    margin: 16px auto;
+  }
+
+  /* Hide the radio buttons */
+  .tab-container input[type="radio"] {
+    display: none;
+  }
+
+  /* Style the tab labels */
+  .tab-labels {
+    display: flex;
+    border-bottom: 2px solid #ddd;
+  }
+
+  .tab-labels label {
+    padding: 12px 24px;
+    cursor: pointer;
+    background-color: #f5f5f5;
+    border-bottom: none;
+    transition: background-color 0.3s;
+  }
+
+  .tab-labels label:hover {
+    background-color: #e8e8e8;
+  }
+  .tab-container input[type="radio"] + label {
+    margin-right: 16px;
+  }
+
+  /* Style active tab */
+  .tab-container input[type="radio"]:checked + label {
+    background-color: white;
+    font-weight: bold;
+  }
+
+  /* Hide all panels by default */
+  .tab-panel {
+    display: none;
+    padding-top: 8px;
+    border-top: none;
+    background-color: white;
+  }
+  .tab-panel input {
+    width: 200px;
+  }
+
+  /* Show panel when corresponding radio is checked */
+  #tab1:checked ~ .tab-panels #panel1,
+  #tab2:checked ~ .tab-panels #panel2,
+  #tab3:checked ~ .tab-panels #panel3 {
+    display: block;
+  }
+}

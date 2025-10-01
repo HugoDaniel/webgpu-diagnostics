@@ -19,13 +19,8 @@ function onRender(params) {
   }
 
   // Adapter Info:
-  for (
-    const [adapterInfoName, adapterInfoValue] of Object.entries(
-      state.adapterInfo,
-    )
-  ) {
-    slots[adapterInfoName].textContent = adapterInfoValue;
-  }
+  slots.adapterInfo.textContent =
+    `Vendor: ${state.adapterInfo.vendor} | Arch: ${state.adapterInfo.architecture}`;
 
   // Features:
   const elements = state.adapterFeatures.map((feature) => {
@@ -39,28 +34,17 @@ function onRender(params) {
   });
   slots.features.replaceChildren(...elements);
 
-  for (
-    const [adapterLimitName, adapterLimitValue] of Object.entries(
-      state.limits.adapter,
-    )
-  ) {
-    slots.adapterLimits.appendChild(
-      limitElement(adapterLimitName, adapterLimitValue),
-    );
-  }
-
-  for (
-    const [deviceLimitName, deviceLimitValue] of Object.entries(
-      state.limits.device,
-    )
-  ) {
-    slots.deviceLimits.appendChild(
-      limitElement(deviceLimitName, deviceLimitValue),
-    );
-  }
+  // Adapter Limits:
+  slots.adapterLimits.replaceChildren(
+    ...Object.entries(state.limits.adapter).map(limitElement),
+  );
+  // Device Limits:
+  slots.deviceLimits.replaceChildren(
+    ...Object.entries(state.limits.device).map(limitElement),
+  );
 }
 
-function limitElement(name, value) {
+function limitElement([name, value]) {
   const limitContainerElem = document.createElement("a");
   limitContainerElem.classList.add("limit");
   limitContainerElem.href =

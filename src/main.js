@@ -36,6 +36,23 @@ const initialUIState = {
     vertex: getVertexShader(),
     fragment: getFragmentShader(),
   },
+  shaderConfig: {
+    compute: {
+      numberOfFunctions: 0,
+      statementsPerFunction: 0,
+      expressionDepthPerStatement: 0,
+    },
+    vertex: {
+      numberOfFunctions: 0,
+      statementsPerFunction: 0,
+      expressionDepthPerStatement: 0,
+    },
+    fragment: {
+      numberOfFunctions: 0,
+      statementsPerFunction: 0,
+      expressionDepthPerStatement: 0,
+    },
+  },
   errors: {
     adapter: [],
     device: [],
@@ -47,6 +64,8 @@ const initialUIState = {
     device: undefined,
     // @ts-expect-error
     context: undefined,
+    // @ts-expect-error
+    canvas: undefined,
   },
 };
 

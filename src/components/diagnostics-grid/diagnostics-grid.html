@@ -41,17 +41,8 @@
       </article>
 
       <article class="panel card" data-ref="adapterInfoCard">
-        <h3>Adapter Info</h3>
-        <ul class="list">
-          <li class="row">
-            <span>Architecture</span>
-            <slot name="architecture" class="val"></slot>
-          </li>
-          <li class="row">
-            <span>Vendor</span>
-            <slot name="vendor" class="val"></slot>
-          </li>
-        </ul>
+        <h3>Shader Config</h3>
+        <shader-config></shader-config>
       </article>
 
       <article class="panel card" data-ref="warningsCard" hidden>
@@ -65,7 +56,13 @@
       </article>
 
       <article class="panel card" data-ref="adapterCard" style="grid-column:1 / -1">
-        <h3>Adapter Limits</h3>
+        <div class="adapter-head">
+          <h3>Adapter Limits</h3>
+          <span class="muted">
+            <slot name="adapterInfo">Yay</slot>
+          </span>
+        </div>
+
         <slot class="limits" name="adapterLimits"></slot>
       </article>
 

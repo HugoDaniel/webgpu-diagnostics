@@ -29,11 +29,16 @@ export type UIState = {
     vertex: string;
     fragment: string;
   };
+  shaderConfig: {
+    compute: ShaderConfig;
+    vertex: ShaderConfig;
+    fragment: ShaderConfig;
+  };
   [runtimeAttribute]: {
     adapter: GPUAdapter;
     device: GPUDevice;
     context: GPUCanvasContext;
-    init: (canvas: HTMLCanvasElement) => void;
+    canvas: HTMLCanvasElement;
   };
   features: {
     available: string[];
@@ -44,4 +49,10 @@ export type UIState = {
     adapter: string[];
     device: string[];
   };
+};
+
+type ShaderConfig = {
+  numberOfFunctions: number;
+  statementsPerFunction: number;
+  expressionDepthPerStatement: number;
 };

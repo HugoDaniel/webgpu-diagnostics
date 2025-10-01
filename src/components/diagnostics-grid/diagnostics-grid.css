@@ -6,25 +6,26 @@
     box-shadow: var(--shadow);
   }
   /* Grid */
-  .grid{
+  .grid {
     display:grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: var(--gap);
+    margin-top: 16px;
   }
-  .card{
+  .card {
     padding:14px;
   }
-  .card h3{
+  .card h3 {
     margin:0 0 10px; font-size: clamp(14px, 1.2vw + 10px, 16px);
     font-weight:600;
   }
-  .list{
+  .list {
     display:flex;
     flex-direction:column;
     gap:8px;
     padding: 0;
   }
-  .row{
+  .row {
     display:flex;
     align-items:center;
     justify-content:space-between;
@@ -35,20 +36,47 @@
     border-bottom:1px dashed color-mix(in oklab, var(--border) 70%, transparent);
   }
   .row:last-child{border-bottom:0}
-  .val{color:var(--text); font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
-  .tags{display:flex; flex-wrap:wrap; gap:6px}
+  .val{
+    color:var(--text);
+    font-variant-numeric: tabular-nums;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
   .tag{
-    font-size:12px; padding:4px 8px; border-radius:999px;
-    border:1px solid var(--border); background: color-mix(in oklab, var(--panel) 70%, transparent);
+    font-size:12px;
+    padding:4px 8px;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background: color-mix(in oklab, var(--panel) 70%, transparent);
   }
 
+  .adapter-head {
+    display:flex;
+    justify-content:space-between;
+  }
+  .adapter-head span {
+    color:var(--muted);
+    font-size:13px;
+    height: 100%;
+  }
   .limits{
-    display:grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap:10px;
-    max-height: 360px; overflow:auto;
+    display:grid;
+    grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+    gap:10px;
+    max-height: 360px;
+    overflow:auto;
   }
   .limit{
-    padding:10px; border:1px solid var(--border); border-radius:10px;
-    display:grid; gap:6px; background: color-mix(in oklab, var(--panel) 85%, transparent);
+    padding:10px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    display:grid;
+    gap:6px;
+    background: color-mix(in oklab, var(--panel) 85%, transparent);
   }
   .limit .name{
     font-size:12px;

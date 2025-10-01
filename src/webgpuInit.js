@@ -32,7 +32,7 @@ export async function webgpuInit(uiState) {
     uiState.timings.adapterRequest = performance.now() - adapterStart;
     uiState[runtimeAttribute].adapter = adapter;
     uiState.limits.adapter = extractLimits(adapter.limits);
-    uiState.adapterFeatures.push(...adapter.features);
+    uiState.adapterFeatures = [...adapter.features];
     uiState.adapterFeatures.sort((a, b) => a.localeCompare(b));
 
     adapterInfo = adapter.info;

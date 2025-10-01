@@ -5,16 +5,17 @@
     border-radius: var(--radius);
     box-shadow: var(--shadow);
   }
-  .canvas-card{
+  .canvas-card {
     overflow:hidden
   }
-  .canvas-head{
+  .canvas-head {
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding: 12px 14px; border-bottom:1px solid var(--border);
+    padding: 12px 14px;
+    border-bottom:1px solid var(--border);
   }
-  .canvas-head span{
+  .canvas-head span {
     color:var(--muted);
     font-size:13px;
   }
