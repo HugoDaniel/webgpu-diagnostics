@@ -39,6 +39,43 @@ function onRender(params) {
   });
   slots.features.replaceChildren(...elements);
 
-  // Adapter Limits:
-  // <div class="limit"><div class="name">${key}</div><div class="num">${displayValue}</div></div>
+  for (
+    const [adapterLimitName, adapterLimitValue] of Object.entries(
+      state.limits.adapter,
+    )
+  ) {
+    slots.adapterLimits.appendChild(
+      limitElement(adapterLimitName, adapterLimitValue),
+    );
+  }
+
+  for (
+    const [deviceLimitName, deviceLimitValue] of Object.entries(
+      state.limits.device,
+    )
+  ) {
+    slots.deviceLimits.appendChild(
+      limitElement(deviceLimitName, deviceLimitValue),
+    );
+  }
+}
+
+function limitElement(name, value) {
+  const limitContainerElem = document.createElement("a");
+  limitContainerElem.classList.add("limit");
+  limitContainerElem.href =
+    `https://www.w3.org/TR/webgpu/#dom-supported-limits-${name.toLocaleLowerCase()}`;
+
+  const nameElem = document.createElement("div");
+  nameElem.classList.add("name");
+  nameElem.textContent = name;
+
+  const numElem = document.createElement("div");
+  numElem.classList.add("num");
+  numElem.textContent = value;
+
+  limitContainerElem.appendChild(nameElem);
+  limitContainerElem.appendChild(numElem);
+
+  return limitContainerElem;
 }

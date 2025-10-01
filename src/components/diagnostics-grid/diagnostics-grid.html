@@ -66,12 +66,12 @@
 
       <article class="panel card" data-ref="adapterCard" style="grid-column:1 / -1">
         <h3>Adapter Limits</h3>
-        <div class="limits" data-ref="adapterLimits"></div>
+        <slot class="limits" name="adapterLimits"></slot>
       </article>
 
       <article class="panel card" data-ref="deviceCard" style="grid-column:1 / -1">
         <h3>Device Limits</h3>
-        <div class="limits" data-ref="deviceLimits"></div>
+        <slot class="limits" name="deviceLimits"></slot>
       </article>
     </section>
 </template>
