@@ -12,11 +12,13 @@ export const DiagnosticsGrid = webComponent(
 /** @type RenderFunction */
 function onRender(params) {
   const { slots, state } = params;
-  // slots.info.textContent = state.canvasInfo;
+
+  // Timings:
   for (const [timingName, timingValue] of Object.entries(state.timings)) {
     slots[timingName].textContent = `${timingValue.toFixed(2)} ms`;
   }
 
+  // Adapter Info:
   for (
     const [adapterInfoName, adapterInfoValue] of Object.entries(
       state.adapterInfo,
@@ -25,6 +27,7 @@ function onRender(params) {
     slots[adapterInfoName].textContent = adapterInfoValue;
   }
 
+  // Features:
   const elements = state.adapterFeatures.map((feature) => {
     const a = document.createElement("a");
 
@@ -34,6 +37,8 @@ function onRender(params) {
 
     return a;
   });
-
   slots.features.replaceChildren(...elements);
+
+  // Adapter Limits:
+  // <div class="limit"><div class="name">${key}</div><div class="num">${displayValue}</div></div>
 }
