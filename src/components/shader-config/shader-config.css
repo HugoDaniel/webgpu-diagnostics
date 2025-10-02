@@ -2,6 +2,10 @@
   .tab-container {
     max-width: 600px;
     margin: 16px auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
   }
 
   /* Hide the radio buttons */
@@ -26,9 +30,9 @@
   .tab-labels label:hover {
     background-color: #e8e8e8;
   }
-  .tab-container input[type="radio"] + label {
-    margin-right: 16px;
-  }
+  /* .tab-container input[type="radio"] + label { 
+     margin-right: 16px; 
+   } */
 
   /* Style active tab */
   .tab-container input[type="radio"]:checked + label {

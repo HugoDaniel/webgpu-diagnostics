@@ -1,9 +1,6 @@
 /** @typedef {import("./types.ts").UIState} UIState */
 /** @typedef {import("boredom").inflictBoreDOM<UIState>} */
 import { inflictBoreDOM } from "../boreDOM.js";
-import { getComputeShader } from "./getComputeShader.js";
-import { getFragmentShader } from "./getFragmentShader.js";
-import { getVertexShader } from "./getVertexShader.js";
 import { runtimeAttribute } from "./runtimeAttribute.js";
 
 /** @type UIState */
@@ -31,11 +28,6 @@ const initialUIState = {
     device: {},
   },
   canvasInfo: "-",
-  shaders: {
-    compute: getComputeShader(),
-    vertex: getVertexShader(),
-    fragment: getFragmentShader(),
-  },
   shaderConfig: {
     compute: {
       numberOfFunctions: 0,

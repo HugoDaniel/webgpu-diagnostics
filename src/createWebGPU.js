@@ -35,9 +35,9 @@ export async function createWebGPU(mutable, canvas) {
       mutable[runtimeAttribute].device,
       mutable[runtimeAttribute].context,
       canvasFormat,
-      getComputeShader(),
-      getVertexShader(),
-      getFragmentShader(),
+      getComputeShader(mutable.shaderConfig.compute),
+      getVertexShader(mutable.shaderConfig.vertex),
+      getFragmentShader(mutable.shaderConfig.fragment),
     ).then((pipelines) => {
       // Update the timings:
       for (const k in pipelines.timings) {

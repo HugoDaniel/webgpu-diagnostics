@@ -1,8 +1,8 @@
 <template data-component="sliders-panel">
     <label for="functions">Number of functions: <span><slot name="functions">-</slot></span></label>
-    <input type="range" name="functions" min="0" max="55000" step="1000" oninput="['numberOfFunctions']" value="0" />
+    <input type="range" name="functions" min="0" max="2000" step="100" oninput="['numberOfFunctions']" value="0" />
     <label for="functions">Statements per function: <span><slot name="statements">-</slot></span></label>
-    <input type="range" name="functions" min="0" max="55000" step="1000" oninput="['statementsPerFunction']" value="0" />
+    <input type="range" name="functions" min="0" max="1024" step="100" oninput="['statementsPerFunction']" value="0" />
     <label for="functions">Statement expression size: <span><slot name="expressionDepth">-</slot></span></label>
-    <input type="range" name="functions" min="0" max="55000" step="1000" oninput="['expressionDepthPerStatement']" value="0" />
+    <input type="range" name="functions" min="0" max="512" step="1" oninput="['expressionDepthPerStatement']" value="0" />
 </template>
