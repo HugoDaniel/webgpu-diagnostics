@@ -13,8 +13,6 @@ export const DiagnosticsGrid = webComponent(
 function onRender(params) {
   const { slots, state, refs } = params;
 
-  console.log("diagnostics-grid rendeR()", state);
-
   // Timings:
   if (state.isCompiling) {
     refs.timingsTitle.classList.add("loading");
@@ -36,39 +34,12 @@ function onRender(params) {
     `Vendor: ${state.adapterInfo.vendor} | Arch: ${state.adapterInfo.architecture}`;
 
   // Features:
-  console.log("diagnostics-grid rendeR() - FEATURES", state.adapterFeatures);
-  if (slots.features.childElementCount === 0) {
-    const elements = state.adapterFeatures.map((feature) => {
-      const a = document.createElement("a");
-
-      a.classList.add("tag");
-      switch (feature) {
-        case "dual-source-blending":
-        case "clip-distances":
-          a.href =
-            `https://www.w3.org/TR/webgpu/#dom-gpufeaturename-${feature}`;
-          break;
-        default:
-          a.href = `https://www.w3.org/TR/webgpu/#${feature}`;
-      }
-      a.innerText = feature;
-      return a;
-    });
-    slots.features.replaceChildren(...elements);
-  }
+  slots.features = createFeaturesContent(state.adapterFeatures);
 
   // Adapter Limits:
-  if (slots.adapterLimits.childElementCount === 0) {
-    slots.adapterLimits.replaceChildren(
-      ...Object.entries(state.limits.adapter).map(limitElement),
-    );
-  }
+  slots.adapterLimits = createLimitsContent(state.limits.adapter);
   // Device Limits:
-  if (slots.deviceLimits.childElementCount === 0) {
-    slots.deviceLimits.replaceChildren(
-      ...Object.entries(state.limits.device).map(limitElement),
-    );
-  }
+  slots.deviceLimits = createLimitsContent(state.limits.device);
 }
 
 function limitElement([name, value]) {
@@ -89,4 +60,46 @@ function limitElement([name, value]) {
   limitContainerElem.appendChild(numElem);
 
   return limitContainerElem;
+}
+
+function createLimitsContent(limits) {
+  const container = document.createElement("div");
+  container.classList.add("limits");
+
+  const entries = Object.entries(limits).map(limitElement);
+  if (entries.length > 0) {
+    container.append(...entries);
+  } else {
+    container.textContent = "–";
+  }
+
+  return container;
+}
+
+function createFeaturesContent(features) {
+  const wrapper = document.createElement("div");
+  wrapper.classList.add("tags");
+
+  if (features.length === 0) {
+    wrapper.textContent = "–";
+    return wrapper;
+  }
+
+  const items = features.map((feature) => {
+    const a = document.createElement("a");
+    a.classList.add("tag");
+    switch (feature) {
+      case "dual-source-blending":
+      case "clip-distances":
+        a.href = `https://www.w3.org/TR/webgpu/#dom-gpufeaturename-${feature}`;
+        break;
+      default:
+        a.href = `https://www.w3.org/TR/webgpu/#${feature}`;
+    }
+    a.innerText = feature;
+    return a;
+  });
+
+  wrapper.append(...items);
+  return wrapper;
 }

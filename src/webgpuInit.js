@@ -73,7 +73,13 @@ export async function webgpuInit(uiState) {
 
     uiState.timings.deviceRequest = performance.now() - deviceStart;
     uiState[runtimeAttribute].device = device;
-    uiState.limits.device = extractLimits(device.limits);
+    const deviceLimits = extractLimits(device.limits);
+    const deviceLimitsState = uiState.limits.device;
+    for (const key of Object.keys(deviceLimitsState)) {
+      const limitKey = /** @type {keyof GPUSupportedLimits} */ (key);
+      delete deviceLimitsState[limitKey];
+    }
+    Object.assign(deviceLimitsState, deviceLimits);
 
     // Set up error handlers
     device.addEventListener("uncapturederror", (event) => {

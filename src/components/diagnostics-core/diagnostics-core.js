@@ -29,6 +29,10 @@ export const DiagnosticsCore = webComponent(
         return;
       }
 
+      if (!mutable.isCompiling) {
+        mutable.isCompiling = true;
+      }
+
       const rect = canvas.getBoundingClientRect();
       const dpr = window.devicePixelRatio;
       const w = canvas.width;
@@ -40,13 +44,24 @@ export const DiagnosticsCore = webComponent(
       mutable.canvasInfo = info;
       mutable[runtimeAttribute].canvas = canvas;
 
-      await createWebGPU(mutable, canvas);
+      try {
+        await createWebGPU(mutable, canvas);
+      } finally {
+        mutable.isCompiling = false;
+      }
 
       const adapter = mutable[runtimeAttribute].adapter;
-      mutable.limits.adapter = extractLimits(adapter.limits);
-      mutable.adapterFeatures = [...adapter.features].sort((a, b) =>
-        a.localeCompare(b)
-      );
+      const adapterLimits = extractLimits(adapter.limits);
+      const adapterLimitsState = mutable.limits.adapter;
+      for (const key of Object.keys(adapterLimitsState)) {
+        const limitKey = /** @type {keyof GPUSupportedLimits} */ (key);
+        // Remove stale values so the UI reflects the freshly extracted limits
+        delete adapterLimitsState[limitKey];
+      }
+      Object.assign(adapterLimitsState, adapterLimits);
+      const features = [...adapter.features].sort((a, b) => a.localeCompare(b));
+      mutable.adapterFeatures.length = 0;
+      mutable.adapterFeatures.push(...features);
       console.log("Rendering done", mutable.adapterFeatures);
     });
 
@@ -71,11 +86,16 @@ function renderCore(params) {
     state[runtimeAttribute].device === undefined
   ) {
     // Send the "canvasReady" event to start initialization
-    dispatchEvent(
-      new CustomEvent("canvasReady", {
-        detail: { event: { currentTarget: self } },
-      }),
-    );
+    if (!self.__canvasInitQueued) {
+      /** @type {any} */ (self).__canvasInitQueued = true;
+      queueMicrotask(() => {
+        dispatchEvent(
+          new CustomEvent("canvasReady", {
+            detail: { event: { currentTarget: self } },
+          }),
+        );
+      });
+    }
   }
 
   // Update the slots:
