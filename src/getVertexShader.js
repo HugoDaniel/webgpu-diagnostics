@@ -33,7 +33,7 @@ fn vertex_main(@builtin(vertex_index) vertex_index: u32) -> VertexOutput {
 
     var output: VertexOutput;
     let vertex = vertex_buffer[vertex_index];
-    output.clip_position = vec4f(vertex.position, 1.0 + accum - accum * 1.0);
+    output.clip_position = vec4f(vertex.position, 1.0); //  + accum - accum * 1.0);
     output.color = vertex.color;
     return output;
 }

@@ -12,6 +12,6 @@ export const DiagnosticsPanelCanvas = webComponent(
 /** @type RenderFunction */
 function onRender(params) {
   const { detail, slots, state } = params;
+
   slots.info.textContent = state.canvasInfo;
-  console.log("GOT PANEL CANVAS", detail, slots);
 }

@@ -1,7 +1,7 @@
 <template data-component="diagnostics-grid">
     <section class="grid mt">
       <article class="panel card" data-ref="timingsCard">
-        <h3>Timings</h3>
+        <h3 data-ref="timingsTitle">Timings</h3>
         <ul class="list">
           <li class="row">
             <span>Adapter request</span>
@@ -35,7 +35,7 @@
       </article>
 
       <article class="panel card" data-ref="featuresCard">
-        <h3>Features</h3>
+        <h3>Features available</h3>
         <slot class="tags" name="features">
         </slot>
       </article>

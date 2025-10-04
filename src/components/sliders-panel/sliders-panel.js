@@ -11,14 +11,17 @@ export const SlidersPanel = webComponent(
     on("numberOfFunctions", ({ state: mutable, e, detail }) => {
       mutable.shaderConfig[detail.data].numberOfFunctions =
         e.event.target.value;
+      mutable.updateTmpShaders();
     });
     on("statementsPerFunction", ({ state: mutable, e, detail }) => {
-      mutable.shaderConfig[detail.data].statementsPerFunction =
-        e.event.target.value;
+      mutable.shaderConfig[detail.data]
+        .statementsPerFunction = e.event.target.value;
+      mutable.updateTmpShaders();
     });
     on("expressionDepthPerStatement", ({ state: mutable, e, detail }) => {
-      mutable.shaderConfig[detail.data].expressionDepthPerStatement =
-        e.event.target.value;
+      mutable.shaderConfig[detail.data]
+        .expressionDepthPerStatement = e.event.target.value;
+      mutable.updateTmpShaders();
     });
 
     return onRender;

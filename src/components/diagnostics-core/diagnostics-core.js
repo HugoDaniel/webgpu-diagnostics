@@ -10,12 +10,13 @@ import { getComputeShader } from "../../getComputeShader.js";
 import { getVertexShader } from "../../getVertexShader.js";
 import { getFragmentShader } from "../../getFragmentShader.js";
 import { createWebGPU } from "../../createWebGPU.js";
+import { extractLimits } from "../../extractLimits.js";
 
 export const DiagnosticsCore = webComponent(
   /** @type InitFunction */
   ({ on, refs }) => {
     // On mount initialization goes here
-    on("canvasReady", ({ state: mutable }) => {
+    on("canvasReady", async ({ state: mutable }) => {
       if (!mutable) {
         console.warn("canvas is ready but state is not available");
         return;
@@ -39,7 +40,14 @@ export const DiagnosticsCore = webComponent(
       mutable.canvasInfo = info;
       mutable[runtimeAttribute].canvas = canvas;
 
-      createWebGPU(mutable, canvas);
+      await createWebGPU(mutable, canvas);
+
+      const adapter = mutable[runtimeAttribute].adapter;
+      mutable.limits.adapter = extractLimits(adapter.limits);
+      mutable.adapterFeatures = [...adapter.features].sort((a, b) =>
+        a.localeCompare(b)
+      );
+      console.log("Rendering done", mutable.adapterFeatures);
     });
 
     on("ui:fill-select", ({ e, state }) => {

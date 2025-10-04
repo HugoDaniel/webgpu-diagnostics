@@ -23,7 +23,8 @@ ${functions}
 fn fragment_main(input: VertexOutput) -> @location(0) vec4f {
     ${application}
     // Output the interpolated color with full opacity
-    return vec4f(input.color, accum);
+    // return vec4f(input.color, accum);
+    return vec4f(input.color, 1.0);
 }
 	`;
 

@@ -47,14 +47,20 @@
     border-top: none;
     background-color: white;
   }
-  .tab-panel input {
-    width: 200px;
-  }
 
   /* Show panel when corresponding radio is checked */
   #tab1:checked ~ .tab-panels #panel1,
   #tab2:checked ~ .tab-panels #panel2,
   #tab3:checked ~ .tab-panels #panel3 {
     display: block;
+  }
+
+  nav {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  slot {
+    text-align: center;
   }
 }

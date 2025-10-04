@@ -5,6 +5,7 @@ export type UIState = {
   selected: number;
   // WebGPU Diagnostics
   isWebGPUSupported: undefined | boolean; // undefined happens when still loading
+  isCompiling: boolean;
   timings: {
     adapterRequest: number;
     deviceRequest: number;

@@ -9,7 +9,6 @@ import { extractLimits } from "./extractLimits.js";
  * @returns {Promise<{ adapterInfo: GPUAdapterInfo | null }>}
  */
 export async function webgpuInit(uiState) {
-  console.log("STATE:", uiState);
   /** @type {GPUAdapterInfo | null} */
   let adapterInfo = null;
   // Try to get the WebGPU adapter
@@ -31,10 +30,6 @@ export async function webgpuInit(uiState) {
     }
     uiState.timings.adapterRequest = performance.now() - adapterStart;
     uiState[runtimeAttribute].adapter = adapter;
-    uiState.limits.adapter = extractLimits(adapter.limits);
-    uiState.adapterFeatures = [...adapter.features];
-    uiState.adapterFeatures.sort((a, b) => a.localeCompare(b));
-
     adapterInfo = adapter.info;
   } catch (err) {
     console.error(err);
@@ -50,7 +45,6 @@ export async function webgpuInit(uiState) {
     // 2. Request Device with selected features
     const deviceStart = performance.now();
 
-    console.log("LIMITS", uiState.limits.adapter, uiState);
     const adapterLimits = uiState.limits.adapter;
     const device = await adapter.requestDevice({
       requiredFeatures: [],
@@ -103,6 +97,5 @@ export async function webgpuInit(uiState) {
     throw new Error("Unknown error when requesting GPUDevice");
   }
 
-  console.log("INFO:", adapterInfo);
   return { adapterInfo };
 }

@@ -1,6 +1,9 @@
 /** @typedef {import("./types.ts").UIState} UIState */
 /** @typedef {import("boredom").inflictBoreDOM<UIState>} */
 import { inflictBoreDOM } from "../boreDOM.js";
+import { getComputeShader } from "./getComputeShader.js";
+import { getFragmentShader } from "./getFragmentShader.js";
+import { getVertexShader } from "./getVertexShader.js";
 import { runtimeAttribute } from "./runtimeAttribute.js";
 
 /** @type UIState */
@@ -22,6 +25,11 @@ const initialUIState = {
     architecture: "-",
     vendor: "-",
   },
+  shaders: {
+    compute: "",
+    vertex: "",
+    fragment: "",
+  },
   adapterFeatures: [],
   limits: {
     adapter: {},
@@ -33,21 +41,53 @@ const initialUIState = {
       numberOfFunctions: 0,
       statementsPerFunction: 0,
       expressionDepthPerStatement: 0,
+      size: 0,
     },
     vertex: {
       numberOfFunctions: 0,
       statementsPerFunction: 0,
       expressionDepthPerStatement: 0,
+      size: 0,
     },
     fragment: {
       numberOfFunctions: 0,
       statementsPerFunction: 0,
       expressionDepthPerStatement: 0,
+      size: 0,
     },
   },
+  selectedShader: "compute",
+  isCompiling: false,
   errors: {
     adapter: [],
     device: [],
+  },
+
+  /**
+   * @param {boolean} all
+   */
+  updateTmpShaders(all) {
+    if (all) {
+      this.shaders.compute = getComputeShader(this.shaderConfig.compute);
+      this.shaders.vertex = getVertexShader(this.shaderConfig.vertex);
+      this.shaders.fragment = getFragmentShader(
+        this.shaderConfig.fragment,
+      );
+    } else {
+      switch (this.selectedShader) {
+        case "compute":
+          this.shaders.compute = getComputeShader(this.shaderConfig.compute);
+          break;
+        case "vertex":
+          this.shaders.vertex = getVertexShader(this.shaderConfig.vertex);
+          break;
+        case "fragment":
+          this.shaders.fragment = getFragmentShader(
+            this.shaderConfig.fragment,
+          );
+          break;
+      }
+    }
   },
   [runtimeAttribute]: {
     // @ts-expect-error

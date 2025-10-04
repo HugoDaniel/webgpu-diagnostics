@@ -12,8 +12,8 @@ importers:
         specifier: ^0.1.65
         version: 0.1.65
       boredom:
-        specifier: npm:@mr_hugo/boredom@^0.25.17
-        version: '@mr_hugo/boredom@0.25.17'
+        specifier: npm:@mr_hugo/boredom@^0.25.19
+        version: '@mr_hugo/boredom@0.25.19'
       typescript:
         specifier: ~5.8.3
         version: 5.8.3
@@ -63,8 +63,8 @@ packages:
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
     engines: {node: '>=12'}
 
-  '@mr_hugo/boredom@0.25.17':
-    resolution: {integrity: sha512-sH8/pZ0U0zeEXSl1fTfLwx3yHwpv2g0tbR/1/7RvNreoE4gxw9NeZFcKbuSWDUSO2qQ0cJ7bNLvM9LUrDgi/1w==}
+  '@mr_hugo/boredom@0.25.19':
+    resolution: {integrity: sha512-8FO/Ersw/auvuh4aRY8Msge8w58OY4b9xD6Be5M9jF/K/kIHcdpsQFo0ft6R/JckBuNDGQ5KPapMsavBuLrxlQ==}
     hasBin: true
 
   '@one-ini/wasm@0.1.1':
@@ -653,7 +653,7 @@ snapshots:
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
 
-  '@mr_hugo/boredom@0.25.17':
+  '@mr_hugo/boredom@0.25.19':
     dependencies:
       cheerio: 1.1.2
       chokidar: 4.0.3

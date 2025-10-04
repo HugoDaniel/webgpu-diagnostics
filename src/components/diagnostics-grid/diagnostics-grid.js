@@ -11,11 +11,24 @@ export const DiagnosticsGrid = webComponent(
 
 /** @type RenderFunction */
 function onRender(params) {
-  const { slots, state } = params;
+  const { slots, state, refs } = params;
+
+  console.log("diagnostics-grid rendeR()", state);
 
   // Timings:
+  if (state.isCompiling) {
+    refs.timingsTitle.classList.add("loading");
+    refs.timingsTitle.textContent += " (loading) ";
+  } else {
+    refs.timingsTitle.classList.remove("loading");
+    refs.timingsTitle.textContent = refs.timingsTitle.textContent?.replace(
+      " (loading) ",
+      "",
+    );
+  }
   for (const [timingName, timingValue] of Object.entries(state.timings)) {
-    slots[timingName].textContent = `${timingValue.toFixed(2)} ms`;
+    const timingStr = state.isCompiling ? "–" : `${timingValue.toFixed(2)} ms`;
+    slots[timingName].textContent = timingStr;
   }
 
   // Adapter Info:
@@ -23,25 +36,39 @@ function onRender(params) {
     `Vendor: ${state.adapterInfo.vendor} | Arch: ${state.adapterInfo.architecture}`;
 
   // Features:
-  const elements = state.adapterFeatures.map((feature) => {
-    const a = document.createElement("a");
+  console.log("diagnostics-grid rendeR() - FEATURES", state.adapterFeatures);
+  if (slots.features.childElementCount === 0) {
+    const elements = state.adapterFeatures.map((feature) => {
+      const a = document.createElement("a");
 
-    a.classList.add("tag");
-    a.href = `https://www.w3.org/TR/webgpu/#${feature}`;
-    a.innerText = feature;
-
-    return a;
-  });
-  slots.features.replaceChildren(...elements);
+      a.classList.add("tag");
+      switch (feature) {
+        case "dual-source-blending":
+        case "clip-distances":
+          a.href =
+            `https://www.w3.org/TR/webgpu/#dom-gpufeaturename-${feature}`;
+          break;
+        default:
+          a.href = `https://www.w3.org/TR/webgpu/#${feature}`;
+      }
+      a.innerText = feature;
+      return a;
+    });
+    slots.features.replaceChildren(...elements);
+  }
 
   // Adapter Limits:
-  slots.adapterLimits.replaceChildren(
-    ...Object.entries(state.limits.adapter).map(limitElement),
-  );
+  if (slots.adapterLimits.childElementCount === 0) {
+    slots.adapterLimits.replaceChildren(
+      ...Object.entries(state.limits.adapter).map(limitElement),
+    );
+  }
   // Device Limits:
-  slots.deviceLimits.replaceChildren(
-    ...Object.entries(state.limits.device).map(limitElement),
-  );
+  if (slots.deviceLimits.childElementCount === 0) {
+    slots.deviceLimits.replaceChildren(
+      ...Object.entries(state.limits.device).map(limitElement),
+    );
+  }
 }
 
 function limitElement([name, value]) {
