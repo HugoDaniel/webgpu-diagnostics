@@ -1,0 +1,28 @@
+:where(diagnostics-panel-canvas) {
+  .panel {
+    background:var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .canvas-card {
+    overflow:hidden
+  }
+  .canvas-head {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 12px 14px;
+    border-bottom:1px solid var(--border);
+  }
+  .canvas-head span {
+    color:var(--muted);
+    font-size:13px;
+  }
+
+  :where(canvas) {
+    width:100%;
+    display:block;
+    aspect-ratio: 16/9; /* responsive */
+  }
+}

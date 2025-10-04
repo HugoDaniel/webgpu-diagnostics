@@ -1,0 +1,39 @@
+:root {
+  --bg: #0b0f14;
+  --panel:#11161d;
+  --muted:#8a97a7;
+  --text:#e8eef6;
+  --brand:#6c8cff;
+  --ok:#2ec27e;
+  --bad:#ff6b6b;
+  --border: #1f2a36;
+  --shadow: 0 4px 20px rgba(0,0,0,.25);
+  --radius: 14px;
+  --gap: 16px;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg:#f6f8fb;
+    --panel:#ffffff;
+    --muted:#667085;
+    --text:#0b1220;
+    --brand:#3b5bfd;
+    --ok:#198754;
+    --bad:#e44;
+    --border:#e7ecf3;
+    --shadow: 0 6px 24px rgba(16,24,40,.08);
+  }
+}
+
+/* Reset minimal */
+* { box-sizing: border-box }
+html { color-scheme: light dark }
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font: 400 16px/1.55 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+}
+
+

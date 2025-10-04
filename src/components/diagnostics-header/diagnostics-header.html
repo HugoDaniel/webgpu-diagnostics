@@ -1,0 +1,11 @@
+<template data-component="diagnostics-header">
+  <div class="wrap titlebar">
+    <h1>WebGPU Diagnostics</h1>
+    <div id="status" class="badge" data-ref="badge">
+      <span class="dot"></span>
+      <slot name="statusText">
+        Initializing...
+      </slot>
+    </div>
+  </div>
+</template>

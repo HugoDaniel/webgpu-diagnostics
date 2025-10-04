@@ -1,0 +1,74 @@
+<template data-component="diagnostics-grid">
+    <section class="grid mt">
+      <article class="panel card" data-ref="timingsCard">
+        <h3 data-ref="timingsTitle">Timings</h3>
+        <ul class="list">
+          <li class="row">
+            <span>Adapter request</span>
+            <slot name="adapterRequest" class="val"></slot>
+          </li>
+          <li class="row">
+            <span>Device request</span>
+            <slot name="deviceRequest" class="val"></slot>
+          </li>
+          <li class="row">
+            <span>Compute Pipeline creation</span>
+            <slot name="computePipelineCreation" class="val"></slot>
+          </li>
+          <li class="row">
+            <span>Render Pipeline creation</span>
+            <slot name="renderPipelineCreation" class="val"></slot>
+          </li>
+          <li class="row">
+            <span>Compute Shader compilation</span>
+            <slot name="computeShaderCompilation" class="val"></slot>
+          </li>
+          <li class="row">
+            <span>Vertex Shader compilation</span>
+            <slot name="vertexShaderCompilation" class="val"></slot>
+          </li>
+          <li class="row">
+            <span>Fragment Shader compilation</span>
+            <slot name="fragmentShaderCompilation" class="val"></slot>
+          </li>
+        </ul>
+      </article>
+
+      <article class="panel card" data-ref="featuresCard">
+        <h3>Features available</h3>
+        <slot class="tags" name="features">
+        </slot>
+      </article>
+
+      <article class="panel card" data-ref="adapterInfoCard">
+        <h3>Shader Config</h3>
+        <shader-config></shader-config>
+      </article>
+
+      <article class="panel card" data-ref="warningsCard" hidden>
+        <h3>Warnings</h3>
+        <div class="list" data-ref="warnings"></div>
+      </article>
+
+      <article class="panel card" data-ref="errorsCard" hidden>
+        <h3>Errors</h3>
+        <div class="list" data-ref="errors"></div>
+      </article>
+
+      <article class="panel card" data-ref="adapterCard" style="grid-column:1 / -1">
+        <div class="adapter-head">
+          <h3>Adapter Limits</h3>
+          <span class="muted">
+            <slot name="adapterInfo">Yay</slot>
+          </span>
+        </div>
+
+        <slot class="limits" name="adapterLimits"></slot>
+      </article>
+
+      <article class="panel card" data-ref="deviceCard" style="grid-column:1 / -1">
+        <h3>Device Limits</h3>
+        <slot class="limits" name="deviceLimits"></slot>
+      </article>
+    </section>
+</template>

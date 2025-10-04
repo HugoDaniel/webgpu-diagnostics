@@ -1,0 +1,113 @@
+:where(diagnostics-grid) {
+  .panel {
+    background:var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  /* Grid */
+  .grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--gap);
+    margin-top: 16px;
+  }
+  .card {
+    padding:14px;
+  }
+  .card h3 {
+    margin:0 0 10px; font-size: clamp(14px, 1.2vw + 10px, 16px);
+    font-weight:600;
+  }
+  .list {
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding: 0;
+  }
+  .row {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    font-size:13px;
+    color:var(--muted);
+    padding:6px 0;
+    border-bottom:1px dashed color-mix(in oklab, var(--border) 70%, transparent);
+  }
+  .row:last-child{border-bottom:0}
+  .val{
+    color:var(--text);
+    font-variant-numeric: tabular-nums;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .tag{
+    font-size:12px;
+    padding:4px 8px;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background: color-mix(in oklab, var(--panel) 70%, transparent);
+  }
+
+  .adapter-head {
+    display:flex;
+    justify-content:space-between;
+  }
+  .adapter-head span {
+    color:var(--muted);
+    font-size:13px;
+    height: 100%;
+  }
+  .limits{
+    display:grid;
+    grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+    gap:10px;
+    max-height: 360px;
+    overflow:auto;
+  }
+  .limit{
+    padding:10px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    display:grid;
+    gap:6px;
+    background: color-mix(in oklab, var(--panel) 85%, transparent);
+  }
+  .limit .name{
+    font-size:12px;
+    color:var(--muted);
+    word-break:break-word;
+    overflow-wrap:anywhere;
+  }
+  .limit .num{
+    font-weight:600;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    overflow-wrap:anywhere;
+  }
+
+  .message{
+    padding:8px 10px;
+    border-radius:8px;
+    background: color-mix(in srgb, var(--panel, #f5f5f5) 80%, transparent);
+    border:1px solid color-mix(in srgb, var(--border, #d5d5d5) 60%, transparent);
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--text, #1f1f1f);
+    white-space: pre-wrap;
+  }
+
+  [data-ref="warningsCard"] .message{
+    border-color: color-mix(in srgb, #ffb347 40%, transparent);
+    background: color-mix(in srgb, #fff7e6 70%, transparent);
+  }
+
+  [data-ref="errorsCard"] .message{
+    border-color: color-mix(in srgb, #ff6b6b 55%, transparent);
+    background: color-mix(in srgb, #ffecec 80%, transparent);
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "webgpu-stress-diagnostics",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "boredom --html src/components --static src --components-serve /components --static-serve /",
+    "build": "tsc && boredom build",
+    "preview": "boredom preview",
+    "version": "boredom version"
+  },
+  "devDependencies": {
+    "@webgpu/types": "^0.1.65",
+    "boredom": "npm:@mr_hugo/boredom@^0.25.21",
+    "typescript": "~5.8.3"
+  }
+}

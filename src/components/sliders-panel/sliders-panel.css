@@ -1,0 +1,12 @@
+:where(sliders-panel) {
+  width: 100%;
+
+  label {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  input {
+    width: 100%;
+  }
+}

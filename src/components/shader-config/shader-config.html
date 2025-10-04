@@ -1,0 +1,38 @@
+<template data-component="shader-config">
+  <div class="tab-container">
+    <!-- Radio buttons for tab state -->
+    <input type="radio" id="tab1" name="tabs" checked onchange="['tab1Change']">
+    <label for="tab1">Compute</label>
+  
+    <input type="radio" id="tab2" name="tabs" onchange="['tab2Change']">
+    <label for="tab2">Vertex</label>
+  
+    <input type="radio" id="tab3" name="tabs" onchange="['tab3Change']">
+    <label for="tab3">Fragment</label>
+
+    <!-- Tab labels wrapper -->
+    <div class="tab-labels">
+    </div>
+
+    <!-- Tab panels -->
+    <slot class="tab-panels" name="panels">
+      <!-- Here goes: <sliders-panel></sliders-panel > -->
+    </slot>
+  </div>
+
+  
+  <nav>
+    <button data-ref="recompileButton" onclick="['recompile']">
+      Compile All
+    </button>
+
+    <slot name="shaderSize">0 KB</slot>
+
+    <button data-ref="codeToggle" onclick="['showCode']">
+      View Code
+    </button>
+  </nav>
+
+  <pre class="code-block" data-ref="codeBlock" hidden></pre>
+
+</template>

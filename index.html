@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WebGPU Diagnostics</title>
+
+  <link rel="stylesheet" type="text/css" href="/root.css" />
+  <!-- The main entry point of the web app JS code -->
+  <script src="./main.js" type="module"></script>
+  <style>
+.wrap {
+  max-width: 1000px;
+  margin-inline:auto;
+  padding: 16px clamp(14px, 2vw, 24px);
+}
+
+
+a {
+  outline-color: transparent;
+}
+
+a:link {
+  color: #6900ff;
+}
+
+a:visited {
+  color: #a5c300;
+}
+
+a:focus {
+  text-decoration: none;
+  background: #bae498;
+}
+
+a:hover {
+  text-decoration: none;
+  background: #cdfeaa;
+}
+
+a:active {
+  background: #6900ff;
+  color: #cdfeaa;
+}
+  </style>
+</head>
+
+<body>
+  <diagnostics-header></diagnostics-header>
+  <main class="wrap">
+    <diagnostics-panel-canvas></diagnostics-panel-canvas>
+
+    <diagnostics-grid></diagnostics-grid>
+  </main>
+
+  <!-- <color-panel></color-panel> -->
+</body>
+</html>

@@ -1,0 +1,13 @@
+<template data-component="diagnostics-panel-canvas">
+  <section class="panel canvas-card">
+    <div class="canvas-head">
+      <strong>Preview</strong>
+      <span id="canvasInfo" class="muted">
+        <slot name="info"></slot>
+      </span>
+    </div>
+    <div class="pad">
+      <diagnostics-core></diagnostics-core>
+    </div>
+  </section>
+</template>
