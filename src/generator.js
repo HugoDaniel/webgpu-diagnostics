@@ -20,13 +20,10 @@ export function generate(
   for (let i = 0; i < n; i++) {
     functions.push(`
 fn function${i}(a: f32) -> f32 {
-  var tmp: f32;
-
+  var tmp: f32 = 0.0;
   ${fStatements}
-
   return a + tmp;
-}
-`);
+}`);
   }
 
   for (let i = 0; i < n; i++) {
@@ -52,8 +49,8 @@ function generateStatements(n, expressionDepthPerStatement) {
 }
 
 function generateExpression(n, sign) {
-  const expression = [];
-  for (let i = 0; i < n; i++) {
+  const expression = ["0.0"];
+  for (let i = 1; i < n; i++) {
     expression.push(`${i}.0`);
   }
 

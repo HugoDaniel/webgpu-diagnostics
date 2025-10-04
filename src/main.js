@@ -58,6 +58,7 @@ const initialUIState = {
   },
   selectedShader: "compute",
   isCompiling: false,
+  showShaderCode: false,
   errors: {
     adapter: [],
     device: [],

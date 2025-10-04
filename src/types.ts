@@ -35,6 +35,8 @@ export type UIState = {
     vertex: ShaderConfig;
     fragment: ShaderConfig;
   };
+  selectedShader: "compute" | "vertex" | "fragment";
+  showShaderCode: boolean;
   [runtimeAttribute]: {
     adapter: GPUAdapter;
     device: GPUDevice;

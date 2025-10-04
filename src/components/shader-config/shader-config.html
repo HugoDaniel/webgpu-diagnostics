@@ -22,15 +22,17 @@
 
   
   <nav>
-    <button onclick="['recompile']">
+    <button data-ref="recompileButton" onclick="['recompile']">
       Compile All
     </button>
 
     <slot name="shaderSize">0 KB</slot>
 
-    <button onclick="['showCode']">
+    <button data-ref="codeToggle" onclick="['showCode']">
       View Code
     </button>
   </nav>
+
+  <pre class="code-block" data-ref="codeBlock" hidden></pre>
 
 </template>

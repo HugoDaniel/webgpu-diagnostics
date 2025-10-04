@@ -63,4 +63,18 @@
   slot {
     text-align: center;
   }
+
+  .code-block {
+    margin-top: 12px;
+    padding: 12px;
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--panel, #f5f5f5) 80%, transparent);
+    font-family: ui-monospace, Menlo, Consolas, "Liberation Mono", monospace;
+    font-size: 13px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    overflow: auto;
+    max-height: 320px;
+  }
 }

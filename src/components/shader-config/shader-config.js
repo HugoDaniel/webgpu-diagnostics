@@ -20,6 +20,10 @@ export const ShaderConfig = webComponent(
       });
     });
 
+    on("showCode", ({ state: mutable }) => {
+      mutable.showShaderCode = !mutable.showShaderCode;
+    });
+
     on(
       "tab1Change",
       ({ state: mutable }) => mutable.selectedShader = "compute",
@@ -36,7 +40,7 @@ export const ShaderConfig = webComponent(
 
 /** @type RenderFunction */
 function onRender(params) {
-  const { slots, makeComponent, state, self } = params;
+  const { slots, makeComponent, state, self, refs } = params;
   console.log("<shader-config>");
   if (!state) return;
 
@@ -75,12 +79,28 @@ function onRender(params) {
       break;
   }
 
-  const buttons = self.querySelectorAll("button");
-  buttons.forEach((btn) => {
+  const recompileButton = refs.recompileButton;
+  if (recompileButton instanceof HTMLButtonElement) {
     if (state.isCompiling) {
-      btn.setAttribute("disabled", "true");
+      recompileButton.setAttribute("disabled", "true");
     } else {
-      btn.removeAttribute("disabled");
+      recompileButton.removeAttribute("disabled");
     }
-  });
+  }
+
+  const codeToggleButton = refs.codeToggle;
+  const codeBlock = refs.codeBlock;
+  if (codeToggleButton instanceof HTMLButtonElement &&
+    codeBlock instanceof HTMLElement) {
+    const currentShader = state.shaders[state.selectedShader] ?? "";
+    if (state.showShaderCode) {
+      codeToggleButton.textContent = "Hide Code";
+      codeBlock.hidden = false;
+      codeBlock.textContent = currentShader || "// No shader code generated yet";
+    } else {
+      codeToggleButton.textContent = "View Code";
+      codeBlock.hidden = true;
+      codeBlock.textContent = "";
+    }
+  }
 }
