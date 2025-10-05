@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "boredom --html src/components",
+    "dev": "boredom --html src/components --static src --static public",
     "validate": "tsc",
     "build": "boredom build",
     "preview": "boredom preview",
