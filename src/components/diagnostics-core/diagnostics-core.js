@@ -19,11 +19,34 @@ export const DiagnosticsCore = webComponent(
 
       // Set the canvas information string:
       const canvas = refs.canvas;
-      if (!(canvas instanceof HTMLCanvasElement)) {
-        console.warn("Canvas reference must be a valid HTMLCanvasElement");
+      const preview = refs.preview;
+      const unsupported = refs.unsupported;
+      if (!(canvas instanceof HTMLCanvasElement) ||
+        !(preview instanceof HTMLElement) ||
+        !(unsupported instanceof HTMLElement)) {
+        console.warn("Canvas preview elements are missing or invalid");
+        mutable.isWebGPUSupported = false;
         return;
       }
 
+      /**
+       * @param {boolean} flag
+       */
+      const setUnsupported = (flag) => {
+        unsupported.hidden = !flag;
+        unsupported.style.display = flag ? "flex" : "none";
+        canvas.hidden = flag;
+        canvas.style.display = flag ? "none" : "block";
+        preview.classList.toggle("is-unsupported", flag);
+      };
+
+      if (!navigator.gpu) {
+        mutable.isWebGPUSupported = false;
+        setUnsupported(true);
+        return;
+      }
+
+      setUnsupported(false);
       if (!mutable.isCompiling) {
         mutable.isCompiling = true;
       }
@@ -42,9 +65,17 @@ export const DiagnosticsCore = webComponent(
 
       try {
         await createWebGPU(mutable, canvas);
+      } catch (error) {
+        mutable.isWebGPUSupported = false;
+        setUnsupported(true);
+        console.error("Failed to initialise WebGPU", error);
+        return;
       } finally {
         mutable.isCompiling = false;
       }
+
+      mutable.isWebGPUSupported = true;
+      setUnsupported(false);
 
       const adapter = runtimeState.adapter;
       if (!adapter) {
@@ -97,6 +128,20 @@ function renderCore(params) {
       });
     }
   }
+
+  const unsupported = /** @type {HTMLElement | null} */ (self.querySelector('[data-ref="unsupported"]'));
+  const canvas = /** @type {HTMLElement | null} */ (self.querySelector('[data-ref="canvas"]'));
+  const preview = /** @type {HTMLElement | null} */ (self.querySelector('[data-ref="preview"]'));
+  const isUnsupported = state.isWebGPUSupported === false;
+  if (unsupported) {
+    unsupported.hidden = !isUnsupported;
+    unsupported.style.display = isUnsupported ? "flex" : "none";
+  }
+  if (canvas) {
+    canvas.hidden = isUnsupported;
+    canvas.style.display = isUnsupported ? "none" : "block";
+  }
+  preview?.classList.toggle("is-unsupported", isUnsupported);
 
   // Update the slots:
   // updatePanelFooterSlot(params);

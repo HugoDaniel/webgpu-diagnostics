@@ -37,3 +37,70 @@ body{
 }
 
 
+.diagnostics-preview {
+  position: relative;
+  min-height: 360px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background: color-mix(in oklab, var(--panel) 92%, transparent);
+}
+
+.diagnostics-preview canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.webgpu-unsupported {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 16px;
+  padding: 32px;
+  max-width: min(600px, 90%);
+  margin: auto;
+  border-radius: var(--radius);
+  border: 1px dashed color-mix(in oklab, var(--border) 80%, transparent);
+  background: color-mix(in oklab, var(--panel) 92%, transparent);
+  backdrop-filter: blur(3px);
+  text-align: left;
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.webgpu-unsupported h3 {
+  margin: 0;
+  font-size: clamp(18px, 1.4vw + 14px, 22px);
+}
+
+.webgpu-unsupported p {
+  margin: 0;
+  color: var(--muted);
+}
+
+
+.webgpu-unsupported ol {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--muted);
+}
+
+.webgpu-unsupported li {
+  line-height: 1.4;
+}
+
+.webgpu-unsupported code,
+.webgpu-unsupported em {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-style: normal;
+  color: var(--text);
+}

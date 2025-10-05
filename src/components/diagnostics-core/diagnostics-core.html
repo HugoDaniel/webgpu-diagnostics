@@ -1,5 +1,19 @@
 <template data-component="diagnostics-core" data-role="section">
-  <canvas data-ref="canvas"> </canvas>
+  <div class="diagnostics-preview" data-ref="preview">
+    <canvas data-ref="canvas" hidden></canvas>
+    <div data-ref="unsupported" class="webgpu-unsupported" hidden>
+      <h3>WebGPU isnt enabled</h3>
+      <p>
+        This browser currently doesnt expose WebGPU. To continue you can try one of the following options:
+      </p>
+      <ol>
+        <li>Use a Chromium-based browser (Chrome, Edge) version 113 or newer.</li>
+        <li>In Chrome/Edge, open <code>chrome://flags</code> and enable <em>Unsafe WebGPU</em>; restart the browser.</li>
+        <li>For Firefox Nightly, set <code>dom.webgpu.enabled</code> and <code>gfx.webgpu.dx12</code> (Windows) or <code>gfx.webgpu.mps</code> (macOS) to true in <code>about:config</code>, then restart.</li>
+        <li>On Linux ensure you launch Chrome/Edge with <code>--enable-features=Vulkan,UseSkiaRenderer</code>.</li>
+      </ol>
+    </div>
+  </div>
 
   <slot name="diagnostics-core-footer">
     <!--
