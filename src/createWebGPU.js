@@ -39,9 +39,15 @@ export async function createWebGPU(mutable, canvas) {
     throw new Error("Could not get WebGPU context from canvas.");
   }
 
+  const runtimeState = mutable[runtimeAttribute];
+  if (runtimeState.animationFrameId !== undefined) {
+    cancelAnimationFrame(runtimeState.animationFrameId);
+    runtimeState.animationFrameId = undefined;
+  }
+
   const { adapterInfo } = await webgpuInit(mutable);
   const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
-  const device = mutable[runtimeAttribute].device;
+  const device = runtimeState.device;
   if (!device) {
     throw new Error("GPU device is not available after initialization");
   }
@@ -51,7 +57,7 @@ export async function createWebGPU(mutable, canvas) {
     format: canvasFormat,
   });
 
-  mutable[runtimeAttribute].context = context;
+  runtimeState.context = context;
   // Set the webgpu as green:
   mutable.isWebGPUSupported = true;
 
@@ -75,7 +81,7 @@ export async function createWebGPU(mutable, canvas) {
   /** @type {Awaited<ReturnType<typeof createComputeAndRenderPipeline>> | undefined} */
   let pipelines;
   try {
-    const pipelineContext = mutable[runtimeAttribute].context;
+    const pipelineContext = runtimeState.context;
     if (!pipelineContext) {
       throw new Error("WebGPU context is not available");
     }
@@ -132,5 +138,10 @@ export async function createWebGPU(mutable, canvas) {
 
   mutable.errors.pipeline.length = 0;
 
-  pipelines.render();
+  const frame = () => {
+    pipelines.render();
+    runtimeState.animationFrameId = requestAnimationFrame(frame);
+  };
+
+  frame();
 }

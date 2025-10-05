@@ -169,6 +169,7 @@ const initialUIState = {
     device: undefined,
     context: undefined,
     canvas: undefined,
+    animationFrameId: undefined,
   }),
 };
 

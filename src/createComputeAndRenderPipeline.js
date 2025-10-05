@@ -82,6 +82,12 @@ export async function createComputeAndRenderPipeline(
     usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
   });
 
+  const rotationUniformBuffer = device.createBuffer({
+    label: "Rotation uniform buffer",
+    size: 16,
+    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+  });
+
   // ============================================
   // 3. Create SEPARATE bind group layouts
   // ============================================
@@ -94,6 +100,12 @@ export async function createComputeAndRenderPipeline(
       visibility: GPUShaderStage.COMPUTE,
       buffer: {
         type: "storage", // read-write storage buffer for compute
+      },
+    }, {
+      binding: 1,
+      visibility: GPUShaderStage.COMPUTE,
+      buffer: {
+        type: "uniform",
       },
     }],
   });
@@ -121,6 +133,11 @@ export async function createComputeAndRenderPipeline(
       binding: 0,
       resource: {
         buffer: vertexBuffer,
+      },
+    }, {
+      binding: 1,
+      resource: {
+        buffer: rotationUniformBuffer,
       },
     }],
   });
@@ -234,7 +251,22 @@ export async function createComputeAndRenderPipeline(
   // 8. Render function
   // ============================================
 
+  const rotationData = new Float32Array(4);
+  const rotationSpeed = Math.PI / 12; // radians per second (slow clockwise)
+  const rotationStart = performance.now();
+
   function render() {
+    const elapsed = (performance.now() - rotationStart) / 1000;
+    const angle = -rotationSpeed * elapsed;
+    rotationData[0] = angle;
+    device.queue.writeBuffer(
+      rotationUniformBuffer,
+      0,
+      rotationData.buffer,
+      rotationData.byteOffset,
+      rotationData.byteLength,
+    );
+
     // Get the current texture from the canvas context
     const currentTexture = context.getCurrentTexture();
 

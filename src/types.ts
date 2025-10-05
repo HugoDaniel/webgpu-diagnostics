@@ -42,6 +42,7 @@ export type UIState = {
     device?: GPUDevice;
     context?: GPUCanvasContext;
     canvas?: HTMLCanvasElement;
+    animationFrameId?: number;
   };
   features: {
     available: string[];
