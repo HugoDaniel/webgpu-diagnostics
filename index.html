@@ -52,6 +52,20 @@ footer {
   font-size: 0.8rem;
   padding-bottom: 32px;
   justify-content: center;
+  align-items: center;
+
+  p {
+    display: flex;
+    align-items: center;
+  }
+  a,
+  span {
+    margin-right: 4px;
+  }
+
+  .sleepy {
+    font-size: 1.5rem;
+  }
 }
   </style>
 </head>
@@ -64,7 +78,7 @@ footer {
     <diagnostics-grid></diagnostics-grid>
   </main>
   <footer>
-    <p>Made with <a href="https://hugodaniel.com/pages/boreDOM/">boreDOM</a> 🥱</p>
+    <p><span>Made with </span><a href="https://hugodaniel.com/pages/boreDOM/">boreDOM</a> <span class="sleepy"> 🥱 </span></p>
   </footer>
 
   <!-- <color-panel></color-panel> -->
