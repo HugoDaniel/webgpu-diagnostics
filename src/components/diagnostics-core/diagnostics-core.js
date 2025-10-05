@@ -52,7 +52,22 @@ export const DiagnosticsCore = webComponent(
       }
 
       const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio;
+      const dpr = window.devicePixelRatio || 1;
+      const cssWidth = Math.max(1, Math.round(rect.width));
+      const cssHeight = Math.max(1, Math.round(rect.height));
+      const targetWidth = Math.max(1, cssWidth * dpr);
+      const targetHeight = Math.max(1, cssHeight * dpr);
+
+      if (canvas.width !== targetWidth) {
+        canvas.width = targetWidth;
+      }
+      if (canvas.height !== targetHeight) {
+        canvas.height = targetHeight;
+      }
+
+      canvas.style.width = `${cssWidth}px`;
+      canvas.style.height = `${cssHeight}px`;
+
       const w = canvas.width;
       const h = canvas.height;
       const info = `CSS: ${Math.floor(rect.width)}×${
