@@ -8,5 +8,46 @@
 
   input {
     width: 100%;
+    appearance: none;
+    height: 6px;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--muted) 25%, transparent);
+  }
+
+  input::-webkit-slider-thumb {
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--brand);
+    border: 2px solid color-mix(in oklab, var(--panel) 60%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--bg) 70%, transparent);
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+
+  input:active::-webkit-slider-thumb {
+    transform: scale(1.05);
+  }
+
+  input::-moz-range-track {
+    height: 6px;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--muted) 25%, transparent);
+  }
+
+  input::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--brand);
+    border: 2px solid color-mix(in oklab, var(--panel) 60%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--bg) 70%, transparent);
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+
+  input:active::-moz-range-thumb {
+    transform: scale(1.05);
   }
 }

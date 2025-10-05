@@ -36,7 +36,7 @@
 
   /* Style active tab */
   .tab-container input[type="radio"]:checked + label {
-    background-color: white;
+    /* background-color: white; */
     font-weight: bold;
   }
 
@@ -45,7 +45,7 @@
     display: none;
     padding-top: 8px;
     border-top: none;
-    background-color: white;
+    /* background-color: white; */
   }
 
   /* Show panel when corresponding radio is checked */
