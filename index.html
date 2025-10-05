@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>WebGPU Diagnostics</title>
 
-  <link rel="stylesheet" type="text/css" href="/root.css" />
+  <link rel="stylesheet" type="text/css" href="root.css" />
   <!-- The main entry point of the web app JS code -->
   <script src="./main.js" type="module"></script>
   <style>
@@ -43,6 +43,16 @@ a:active {
   background: #6900ff;
   color: #cdfeaa;
 }
+
+main {
+  margin-bottom: 32px;
+}
+footer {
+  display: flex;
+  font-size: 0.8rem;
+  padding-bottom: 32px;
+  justify-content: center;
+}
   </style>
 </head>
 
@@ -53,6 +63,9 @@ a:active {
 
     <diagnostics-grid></diagnostics-grid>
   </main>
+  <footer>
+    <p>Made with <a href="https://hugodaniel.com/pages/boreDOM/">boreDOM</a></p>
+  </footer>
 
   <!-- <color-panel></color-panel> -->
 </body>

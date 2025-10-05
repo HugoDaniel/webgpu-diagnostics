@@ -1,6 +1,6 @@
 /** @typedef {import("./types.ts").UIState} UIState */
 /** @typedef {import("boredom").inflictBoreDOM<UIState>} */
-import { inflictBoreDOM } from "../boreDOM.js";
+import { inflictBoreDOM } from "boredom";
 import { runtimeAttribute } from "./runtimeAttribute.js";
 import { generateAllShaders, generateShader } from "./shaderCodeService.js";
 
@@ -128,7 +128,9 @@ const initialUIState = {
 
       const shader = shaderOverride ?? this.selectedShader;
       clearShaderError(shader);
-      const code = await generateShader(shader, { ...this.shaderConfig[shader] });
+      const code = await generateShader(shader, {
+        ...this.shaderConfig[shader],
+      });
       this.shaders[shader] = code;
     } catch (error) {
       const shader = shaderOverride ?? (all ? "all" : this.selectedShader);
