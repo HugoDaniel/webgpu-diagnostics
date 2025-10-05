@@ -41,7 +41,6 @@ export const ShaderConfig = webComponent(
 /** @type RenderFunction */
 function onRender(params) {
   const { slots, makeComponent, state, self, refs } = params;
-  console.log("<shader-config>");
   if (!state) return;
 
   if (slots.panels.childElementCount === 0) {

@@ -57,7 +57,6 @@ export const DiagnosticsCore = webComponent(
       const features = [...adapter.features].sort((a, b) => a.localeCompare(b));
       mutable.adapterFeatures.length = 0;
       mutable.adapterFeatures.push(...features);
-      console.log("Rendering done", mutable.adapterFeatures);
     });
 
     on("ui:fill-select", ({ e, state }) => {
