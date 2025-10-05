@@ -1,9 +1,11 @@
 :where(diagnostics-header) {
+  display: block;
   position: sticky;
   top: 0;
   z-index: 10;
-  backdrop-filter: saturate(1.2) blur(8px);
-  background: color-mix(in oklab, var(--bg) 70%, transparent);
+  backdrop-filter: saturate(1.2) blur(12px);
+  -webkit-backdrop-filter: saturate(1.2) blur(12px);
+  background: color-mix(in oklab, var(--bg) 85%, transparent);
   border-bottom: 1px solid var(--border);
 
   :where(h1){

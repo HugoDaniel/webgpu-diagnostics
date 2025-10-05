@@ -27,32 +27,23 @@
 }
 
 
-a {
-  outline-color: transparent;
-}
+  a {
+    outline: none;
+    color: var(--brand);
+    transition: color 0.2s ease, background 0.2s ease;
+  }
 
-a:link {
-  color: #6900ff;
-}
+  a:visited {
+    color: color-mix(in oklab, var(--brand) 70%, var(--text) 30%);
+  }
 
-a:visited {
-  color: #a5c300;
-}
-
-a:focus {
-  text-decoration: none;
-  background: #bae498;
-}
-
-a:hover {
-  text-decoration: none;
-  background: #cdfeaa;
-}
-
-a:active {
-  background: #6900ff;
-  color: #cdfeaa;
-}
+  a:focus,
+  a:hover,
+  a:active {
+    text-decoration: none;
+    background: color-mix(in oklab, var(--brand) 12%, transparent);
+    color: var(--brand);
+  }
 
 main {
   margin-bottom: 32px;
