@@ -3,6 +3,9 @@ import { webgpuInit } from "./webgpuInit.js";
 import { createComputeAndRenderPipeline } from "./createComputeAndRenderPipeline.js";
 import { runtimeAttribute } from "./runtimeAttribute.js";
 
+/**
+ * @param {unknown} scope
+ */
 const normalizeScope = (scope) => {
   if (!scope) return "";
   const text = String(scope);
@@ -10,6 +13,10 @@ const normalizeScope = (scope) => {
   return text.charAt(0).toUpperCase() + text.slice(1);
 };
 
+/**
+ * @param {unknown} scope
+ * @param {unknown} error
+ */
 const formatError = (scope, error) => {
   const normalizedScope = normalizeScope(scope);
   const prefix = normalizedScope ? `[${normalizedScope}] ` : "";
@@ -34,8 +41,13 @@ export async function createWebGPU(mutable, canvas) {
 
   const { adapterInfo } = await webgpuInit(mutable);
   const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
+  const device = mutable[runtimeAttribute].device;
+  if (!device) {
+    throw new Error("GPU device is not available after initialization");
+  }
+
   context.configure({
-    device: mutable[runtimeAttribute].device,
+    device,
     format: canvasFormat,
   });
 
@@ -43,8 +55,13 @@ export async function createWebGPU(mutable, canvas) {
   // Set the webgpu as green:
   mutable.isWebGPUSupported = true;
 
-  mutable.adapterInfo.architecture = String(adapterInfo.architecture);
-  mutable.adapterInfo.vendor = String(adapterInfo.vendor);
+  if (adapterInfo) {
+    mutable.adapterInfo.architecture = String(adapterInfo.architecture);
+    mutable.adapterInfo.vendor = String(adapterInfo.vendor);
+  } else {
+    mutable.adapterInfo.architecture = "-";
+    mutable.adapterInfo.vendor = "-";
+  }
 
   if (
     mutable.shaders.compute.length === 0 ||
@@ -55,11 +72,16 @@ export async function createWebGPU(mutable, canvas) {
   }
 
   // Create the pipelines
+  /** @type {Awaited<ReturnType<typeof createComputeAndRenderPipeline>> | undefined} */
   let pipelines;
   try {
+    const pipelineContext = mutable[runtimeAttribute].context;
+    if (!pipelineContext) {
+      throw new Error("WebGPU context is not available");
+    }
     pipelines = await createComputeAndRenderPipeline(
-      mutable[runtimeAttribute].device,
-      mutable[runtimeAttribute].context,
+      device,
+      pipelineContext,
       canvasFormat,
       mutable.shaders.compute,
       mutable.shaders.vertex,
@@ -74,9 +96,13 @@ export async function createWebGPU(mutable, canvas) {
     return;
   }
 
+  if (!pipelines) {
+    return;
+  }
+
   // Update the timings:
-  for (const k in pipelines.timings) {
-    mutable.timings[k] = pipelines.timings[k];
+  for (const [name, value] of /** @type {Array<[keyof UIState["timings"], number]>} */ (Object.entries(pipelines.timings))) {
+    mutable.timings[name] = value;
   }
 
   const diagnostics = pipelines.diagnostics?.compilation;

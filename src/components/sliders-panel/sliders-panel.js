@@ -1,19 +1,38 @@
 // @ts-check
 /** @typedef {import("../../types").UIState} UIState */
-/** @typedef {import("boredom").webComponent<UIState>} webComponent */
+/** @typedef {import("boredom").InitFunction<UIState | undefined>} InitFunction */
 /** @typedef {import("boredom").RenderFunction<UIState | undefined>} RenderFunction */
-/** @typedef {import("boredom").WebComponentRenderParams<UIState>} WebComponentRenderParams */
+/** @typedef {import("boredom").WebComponentRenderParams<UIState | undefined>} WebComponentRenderParams */
 import { webComponent } from "boredom";
+
+/** @typedef {"compute" | "vertex" | "fragment"} ShaderKind */
+
+/**
+ * @param {unknown} value
+ * @returns {ShaderKind}
+ */
+function normalizeShaderKind(value) {
+  if (value === "vertex" || value === "fragment") {
+    return value;
+  }
+  return "compute";
+}
 
 export const SlidersPanel = webComponent(
   /** @type InitFunction */
-  ({ on, refs }) => {
+  ({ on }) => {
     const DEBOUNCE_MS = 150;
+    /** @type {Map<"compute" | "vertex" | "fragment", ReturnType<typeof setTimeout>>} */
     const debounceTimers = new Map();
 
+    /**
+     * @param {UIState | undefined} mutable
+     * @param {ShaderKind} shader
+     */
     const queueUpdate = (mutable, shader) => {
+      if (!mutable) return;
       const existing = debounceTimers.get(shader);
-      if (typeof existing === "number") {
+      if (existing) {
         clearTimeout(existing);
       }
 
@@ -28,45 +47,57 @@ export const SlidersPanel = webComponent(
     };
 
     on("numberOfFunctions", ({ state: mutable, e, detail }) => {
-      const value = Number(e.event.target.value);
-      mutable.shaderConfig[detail.data].numberOfFunctions = value;
-      queueUpdate(mutable, detail.data);
+      if (!mutable) return;
+      const value = Number((/** @type {HTMLInputElement} */ (e.event.target)).value);
+      const shader = normalizeShaderKind(detail?.data);
+      mutable.shaderConfig[shader].numberOfFunctions = value;
+      queueUpdate(mutable, shader);
     });
     on("statementsPerFunction", ({ state: mutable, e, detail }) => {
-      const value = Number(e.event.target.value);
-      mutable.shaderConfig[detail.data]
+      if (!mutable) return;
+      const value = Number((/** @type {HTMLInputElement} */ (e.event.target)).value);
+      const shader = normalizeShaderKind(detail?.data);
+      mutable.shaderConfig[shader]
         .statementsPerFunction = value;
-      queueUpdate(mutable, detail.data);
+      queueUpdate(mutable, shader);
     });
     on("expressionDepthPerStatement", ({ state: mutable, e, detail }) => {
-      const value = Number(e.event.target.value);
-      mutable.shaderConfig[detail.data]
+      if (!mutable) return;
+      const value = Number((/** @type {HTMLInputElement} */ (e.event.target)).value);
+      const shader = normalizeShaderKind(detail?.data);
+      mutable.shaderConfig[shader]
         .expressionDepthPerStatement = value;
-      queueUpdate(mutable, detail.data);
+      queueUpdate(mutable, shader);
     });
 
     return onRender;
   },
 );
 
-/** @type RenderFunction */
+/** @type {RenderFunction} */
 function onRender(params) {
-  const { detail, slots, state, self } = params;
+  const { detail, slots: rawSlots, state } =
+    /** @type {WebComponentRenderParams} */ (params);
+  if (!state) return;
 
-  let shader = "compute";
+  const slots = /** @type {Record<string, HTMLElement>} */ (rawSlots);
 
-  // detail is an object sent in the creation of this component
-  // check the shader-config.js to see how this is being created
-  // dynamically
-  if (detail.data) {
-    shader = detail.data;
+  const shader = normalizeShaderKind(detail?.data);
+
+  const config = state.shaderConfig[shader];
+  const functionsSlot = /** @type {HTMLElement | undefined} */ (slots.functions);
+  const statementsSlot = /** @type {HTMLElement | undefined} */ (slots.statements);
+  const depthSlot = /** @type {HTMLElement | undefined} */ (slots.expressionDepth);
+
+  if (functionsSlot) {
+    functionsSlot.textContent = String(config.numberOfFunctions);
   }
-
-  slots.functions.textContent = state.shaderConfig[shader].numberOfFunctions;
-  slots.statements.textContent =
-    state.shaderConfig[shader].statementsPerFunction;
-  slots.expressionDepth.textContent =
-    state.shaderConfig[shader].expressionDepthPerStatement;
+  if (statementsSlot) {
+    statementsSlot.textContent = String(config.statementsPerFunction);
+  }
+  if (depthSlot) {
+    depthSlot.textContent = String(config.expressionDepthPerStatement);
+  }
 
   // self.setAttribute("data-shader", shader);
 }

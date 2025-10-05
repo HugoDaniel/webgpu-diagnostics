@@ -1,9 +1,18 @@
+// @ts-check
+/** @typedef {import("./types").ShaderConfig} ShaderConfig */
+/** @typedef {"compute" | "vertex" | "fragment"} ShaderKind */
+
 import { getComputeShader } from "./getComputeShader.js";
 import { getVertexShader } from "./getVertexShader.js";
 import { getFragmentShader } from "./getFragmentShader.js";
 
 const MAX_SHADER_LENGTH = Number.MAX_SAFE_INTEGER;
 
+/**
+ * @param {string} shaderName
+ * @param {string} code
+ * @param {ShaderConfig | undefined} config
+ */
 const ensureWithinLimits = (shaderName, code, config) => {
   const limit = typeof config?.size === "number" && config.size > 0
     ? config.size
@@ -16,16 +25,19 @@ const ensureWithinLimits = (shaderName, code, config) => {
 };
 
 /**
- * @param {MessageEvent} event
+ * @param {MessageEvent<{ id?: number; type?: string; payload?: unknown }>} event
  */
 self.onmessage = (event) => {
   const { id, type, payload } = event.data ?? {};
+  /**
+   * @param {{ ok: boolean; result?: unknown; error?: unknown }} message
+   */
   const respond = (message) => self.postMessage({ id, ...message });
 
   try {
     switch (type) {
       case "generate-all": {
-        const { configs } = payload ?? {};
+        const { configs } = /** @type {GenerateAllPayload} */ (payload ?? {});
         const compute = getComputeShader(configs?.compute);
         ensureWithinLimits("Compute", compute, configs?.compute);
         const vertex = getVertexShader(configs?.vertex);
@@ -43,7 +55,7 @@ self.onmessage = (event) => {
         break;
       }
       case "generate-one": {
-        const { shader, config } = payload ?? {};
+        const { shader, config } = /** @type {GenerateOnePayload} */ (payload ?? {});
         let code = "";
         if (shader === "compute") code = getComputeShader(config);
         else if (shader === "vertex") code = getVertexShader(config);
@@ -66,3 +78,6 @@ self.onmessage = (event) => {
     });
   }
 };
+
+/** @typedef {{ configs?: Partial<Record<ShaderKind, ShaderConfig>> }} GenerateAllPayload */
+/** @typedef {{ shader: ShaderKind; config?: ShaderConfig }} GenerateOnePayload */

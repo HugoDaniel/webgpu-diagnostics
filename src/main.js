@@ -1,9 +1,12 @@
 /** @typedef {import("./types.ts").UIState} UIState */
-/** @typedef {import("boredom").inflictBoreDOM<UIState>} */
+/** @typedef {import("./types.ts").ShaderConfig} ShaderConfig */
 import { inflictBoreDOM } from "boredom";
 import { runtimeAttribute } from "./runtimeAttribute.js";
 import { generateAllShaders, generateShader } from "./shaderCodeService.js";
 
+/**
+ * @param {unknown} scope
+ */
 function normalizeScope(scope) {
   if (!scope) return "";
   const asString = String(scope);
@@ -11,6 +14,10 @@ function normalizeScope(scope) {
   return asString.charAt(0).toUpperCase() + asString.slice(1);
 }
 
+/**
+ * @param {unknown} error
+ * @param {unknown} scope
+ */
 function formatErrorMessage(error, scope) {
   const normalizedScope = normalizeScope(scope);
   const prefix = normalizedScope ? `[${normalizedScope}] ` : "";
@@ -48,6 +55,11 @@ const initialUIState = {
     fragment: "",
   },
   adapterFeatures: [],
+  features: {
+    available: [],
+    unsupported: [],
+    additional: [],
+  },
   limits: {
     adapter: {},
     device: {},
@@ -90,9 +102,17 @@ const initialUIState = {
   /**
    * @param {boolean} all
    */
+  /**
+   * @this {UIState}
+   * @param {boolean} all
+   * @param {"compute" | "vertex" | "fragment"} [shaderOverride]
+   */
   async updateTmpShaders(all, shaderOverride) {
     const shaderErrors = this.errors.shader;
 
+    /**
+     * @param {string | undefined} shaderName
+     */
     const clearShaderError = (shaderName) => {
       if (!Array.isArray(shaderErrors) || shaderErrors.length === 0) return;
       const scopeLabel = normalizeScope(shaderName);
@@ -105,6 +125,10 @@ const initialUIState = {
       }
     };
 
+    /**
+     * @param {string | undefined} shaderName
+     * @param {unknown} error
+     */
     const captureShaderError = (shaderName, error) => {
       const message = formatErrorMessage(error, shaderName);
       clearShaderError(shaderName);
@@ -113,11 +137,11 @@ const initialUIState = {
 
     try {
       if (all) {
-        const configs = {
+        const configs = /** @type {{ compute: ShaderConfig; vertex: ShaderConfig; fragment: ShaderConfig }} */ ({
           compute: { ...this.shaderConfig.compute },
           vertex: { ...this.shaderConfig.vertex },
           fragment: { ...this.shaderConfig.fragment },
-        };
+        });
         const { compute, vertex, fragment } = await generateAllShaders(configs);
         shaderErrors.length = 0;
         this.shaders.compute = compute;
@@ -126,7 +150,9 @@ const initialUIState = {
         return;
       }
 
-      const shader = shaderOverride ?? this.selectedShader;
+      const shader = /** @type {"compute" | "vertex" | "fragment"} */ (
+        shaderOverride ?? this.selectedShader
+      );
       clearShaderError(shader);
       const code = await generateShader(shader, {
         ...this.shaderConfig[shader],
@@ -138,16 +164,12 @@ const initialUIState = {
       throw error;
     }
   },
-  [runtimeAttribute]: {
-    // @ts-expect-error
+  [runtimeAttribute]: /** @type {UIState[typeof runtimeAttribute]} */ ({
     adapter: undefined,
-    // @ts-expect-error
     device: undefined,
-    // @ts-expect-error
     context: undefined,
-    // @ts-expect-error
     canvas: undefined,
-  },
+  }),
 };
 
 window.addEventListener("DOMContentLoaded", async () => {

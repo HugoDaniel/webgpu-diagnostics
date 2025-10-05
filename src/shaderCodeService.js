@@ -1,9 +1,26 @@
+// @ts-check
+/** @typedef {import("./types").ShaderConfig} ShaderConfig */
+
 import { getComputeShader } from "./getComputeShader.js";
 import { getFragmentShader } from "./getFragmentShader.js";
 import { getVertexShader } from "./getVertexShader.js";
 
+/** @typedef {"compute" | "vertex" | "fragment"} ShaderKind */
+/** @typedef {{ compute: string; vertex: string; fragment: string }} ShaderBundle */
+/** @typedef {{ configs?: Partial<Record<ShaderKind, ShaderConfig>> }} GenerateAllPayload */
+/** @typedef {{ shader: ShaderKind; config?: ShaderConfig }} GenerateOnePayload */
+/**
+ * @typedef {Object} WorkerQueueEntry
+ * @property {(value: ShaderBundle | string) => void} resolve
+ * @property {(reason: Error) => void} reject
+ * @property {"generate-all" | "generate-one"} type
+ * @property {GenerateAllPayload | GenerateOnePayload} payload
+ */
+
+/** @type {Worker | undefined} */
 let workerInstance;
 let requestId = 0;
+/** @type {Map<number, WorkerQueueEntry>} */
 const pending = new Map();
 
 const MAX_SHADER_LENGTH = Number.MAX_SAFE_INTEGER;
@@ -12,37 +29,43 @@ let workerDisabled = !WORKER_SUPPORTED;
 
 const FALLBACK_WORKER_ERROR = "Shader worker error";
 
+/**
+ * @param {unknown} err
+ * @param {string} [fallbackMessage]
+ * @returns {Error}
+ */
 const toError = (err, fallbackMessage = FALLBACK_WORKER_ERROR) => {
   if (err instanceof Error) return err;
   if (typeof err === "string") return new Error(err);
 
   if (err && typeof err === "object") {
-    const maybeError = err.error;
-    if (maybeError !== undefined) {
-      const nested = toError(maybeError, fallbackMessage);
+    const errObj = /** @type {Record<string, unknown>} */ (err);
+
+    if ("error" in errObj && errObj.error !== undefined) {
+      const nested = toError(errObj.error, fallbackMessage);
       if (nested.message) return nested;
     }
 
-    if (typeof err.message === "string") {
-      return err.message.length > 0
-        ? new Error(err.message)
+    if (typeof errObj.message === "string") {
+      return errObj.message.length > 0
+        ? new Error(errObj.message)
         : new Error(fallbackMessage);
     }
 
-    if (typeof err.reason === "string" && err.reason.length > 0) {
-      return new Error(err.reason);
+    if (typeof errObj.reason === "string" && errObj.reason.length > 0) {
+      return new Error(errObj.reason);
     }
 
-    if (typeof err.type === "string") {
+    if (typeof errObj.type === "string") {
       const locationParts = [];
-      if (typeof err.filename === "string" && err.filename.length > 0) {
-        const lineInfo = [err.lineno, err.colno]
+      if (typeof errObj.filename === "string" && errObj.filename.length > 0) {
+        const lineInfo = [errObj.lineno, errObj.colno]
           .filter((value) => Number.isFinite(value))
           .join(":");
-        locationParts.push(`${err.filename}${lineInfo ? `:${lineInfo}` : ""}`);
+        locationParts.push(`${errObj.filename}${lineInfo ? `:${lineInfo}` : ""}`);
       }
       const location = locationParts.length > 0 ? ` (${locationParts.join(", ")})` : "";
-      return new Error(`${fallbackMessage}: ${err.type}${location}`);
+      return new Error(`${fallbackMessage}: ${errObj.type}${location}`);
     }
   }
 
@@ -53,6 +76,11 @@ const toError = (err, fallbackMessage = FALLBACK_WORKER_ERROR) => {
   }
 };
 
+/**
+ * @param {string} shaderName
+ * @param {string} code
+ * @param {ShaderConfig | undefined} config
+ */
 const ensureWithinLimits = (shaderName, code, config) => {
   const limit = typeof config?.size === "number" && config.size > 0
     ? config.size
@@ -64,10 +92,15 @@ const ensureWithinLimits = (shaderName, code, config) => {
   }
 };
 
+/**
+ * @param {"generate-all" | "generate-one"} type
+ * @param {GenerateAllPayload | GenerateOnePayload} payload
+ * @returns {ShaderBundle | string}
+ */
 const runLocally = (type, payload) => {
   switch (type) {
     case "generate-all": {
-      const { configs } = payload ?? {};
+      const { configs } = /** @type {GenerateAllPayload} */ (payload ?? {});
       const compute = getComputeShader(configs?.compute);
       ensureWithinLimits("Compute", compute, configs?.compute);
       const vertex = getVertexShader(configs?.vertex);
@@ -81,7 +114,7 @@ const runLocally = (type, payload) => {
       };
     }
     case "generate-one": {
-      const { shader, config } = payload ?? {};
+      const { shader, config } = /** @type {GenerateOnePayload} */ (payload ?? {});
       let code = "";
       if (shader === "compute") code = getComputeShader(config);
       else if (shader === "vertex") code = getVertexShader(config);
@@ -98,14 +131,23 @@ const runLocally = (type, payload) => {
   }
 };
 
+/**
+ * @param {"generate-all" | "generate-one"} type
+ * @param {GenerateAllPayload | GenerateOnePayload} payload
+ * @returns {Promise<ShaderBundle | string>}
+ */
 const runLocallyAsync = (type, payload) => Promise.resolve().then(() => runLocally(type, payload));
 
+/**
+ * @param {Error=} cause
+ * @param {WorkerQueueEntry=} additionalEntry
+ */
 const disableWorker = (cause, additionalEntry) => {
   workerInstance?.terminate?.();
   workerInstance = undefined;
   workerDisabled = true;
 
-  const entries = [...pending.values()];
+  const entries = /** @type {WorkerQueueEntry[]} */ ([...pending.values()]);
   pending.clear();
   if (additionalEntry) entries.push(additionalEntry);
   if (entries.length === 0) {
@@ -125,6 +167,9 @@ const disableWorker = (cause, additionalEntry) => {
   if (cause) console.error(FALLBACK_WORKER_ERROR, cause);
 };
 
+/**
+ * @returns {Worker | undefined}
+ */
 function getWorker() {
   if (workerDisabled) return undefined;
   if (!workerInstance) {
@@ -138,18 +183,20 @@ function getWorker() {
       return undefined;
     }
 
-    workerInstance.onmessage = (event) => {
+    /** @type {(event: MessageEvent<{ id?: number; ok?: boolean; result?: unknown; error?: unknown }>) => void} */
+    const handleMessage = (event) => {
       const { id, ok, result, error } = event.data ?? {};
       if (typeof id !== "number") return;
       const entry = pending.get(id);
       if (!entry) return;
       pending.delete(id);
       if (ok) {
-        entry.resolve(result);
+        entry.resolve(/** @type {ShaderBundle | string} */ (result));
       } else {
         entry.reject(toError(error));
       }
     };
+    workerInstance.onmessage = handleMessage;
 
     workerInstance.onerror = (event) => {
       const err = toError(event);
@@ -163,6 +210,11 @@ function getWorker() {
   return workerInstance;
 }
 
+/**
+ * @param {"generate-all" | "generate-one"} type
+ * @param {GenerateAllPayload | GenerateOnePayload} payload
+ * @returns {Promise<ShaderBundle | string>}
+ */
 function postToWorker(type, payload) {
   if (workerDisabled) {
     return runLocallyAsync(type, payload);
@@ -175,6 +227,7 @@ function postToWorker(type, payload) {
 
   const id = ++requestId;
   return new Promise((resolve, reject) => {
+    /** @type {GenerateAllPayload | GenerateOnePayload} */
     let messagePayload = payload;
     try {
       if (typeof structuredClone === "function") {
@@ -186,7 +239,7 @@ function postToWorker(type, payload) {
       console.warn("Falling back to original payload for worker message", error);
     }
 
-    const entry = { resolve, reject, type, payload: messagePayload };
+    const entry = /** @type {WorkerQueueEntry} */ ({ resolve, reject, type, payload: messagePayload });
     pending.set(id, entry);
 
     try {
@@ -198,10 +251,19 @@ function postToWorker(type, payload) {
   });
 }
 
+/**
+ * @param {Partial<Record<ShaderKind, ShaderConfig>> | undefined} configs
+ * @returns {Promise<ShaderBundle>}
+ */
 export function generateAllShaders(configs) {
-  return postToWorker("generate-all", { configs });
+  return /** @type {Promise<ShaderBundle>} */ (postToWorker("generate-all", { configs }));
 }
 
+/**
+ * @param {ShaderKind} shader
+ * @param {ShaderConfig | undefined} config
+ * @returns {Promise<string>}
+ */
 export function generateShader(shader, config) {
-  return postToWorker("generate-one", { shader, config });
+  return /** @type {Promise<string>} */ (postToWorker("generate-one", { shader, config }));
 }

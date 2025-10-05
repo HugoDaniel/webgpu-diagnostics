@@ -42,6 +42,9 @@ export async function webgpuInit(uiState) {
   // Try to get the WebGPU device
   try {
     const adapter = uiState[runtimeAttribute].adapter;
+    if (!adapter) {
+      throw new Error("GPU adapter is not initialised");
+    }
     // 2. Request Device with selected features
     const deviceStart = performance.now();
 
@@ -110,6 +113,9 @@ export async function webgpuInit(uiState) {
   return { adapterInfo };
 }
 
+/**
+ * @param {string | undefined} reason
+ */
 function normalizeReason(reason) {
   if (!reason) return "Device";
   if (reason === "unknown") return "Device";

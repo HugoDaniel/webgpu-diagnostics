@@ -1,3 +1,10 @@
+// @ts-check
+
+/**
+ * @param {number} n
+ * @param {number} statements
+ * @param {number} expressionDepthPerStatement
+ */
 export function generate(
   n,
   statements,
@@ -11,6 +18,7 @@ export function generate(
     });
   }
 
+  /** @type {string[]} */
   const functions = [];
 
   const fStatements = generateStatements(
@@ -36,7 +44,12 @@ fn function${i}(a: f32) -> f32 {
   };
 }
 
+/**
+ * @param {number} n
+ * @param {number} expressionDepthPerStatement
+ */
 function generateStatements(n, expressionDepthPerStatement) {
+  /** @type {string[]} */
   const statements = [];
   const expression = generateExpression(expressionDepthPerStatement, "+");
   for (let i = 0; i < n; i++) {
@@ -48,6 +61,10 @@ function generateStatements(n, expressionDepthPerStatement) {
   return statements.join("\n");
 }
 
+/**
+ * @param {number} n
+ * @param {"+" | "-" | "*" | "/"} sign
+ */
 function generateExpression(n, sign) {
   const expression = ["0.0"];
   for (let i = 1; i < n; i++) {

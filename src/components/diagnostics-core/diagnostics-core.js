@@ -1,7 +1,7 @@
 // @ts-check
 /** @typedef {import("../../types").UIState} UIState */
 /** @typedef {import("boredom").InitFunction<UIState | undefined>} InitFunction */
-/** @typedef {import("boredom").WebComponentRenderParams<UIState>} WebComponentRenderParams */
+/** @typedef {import("boredom").WebComponentRenderParams<UIState | undefined>} WebComponentRenderParams */
 import { webComponent } from "boredom";
 import { runtimeAttribute } from "../../runtimeAttribute.js";
 import { createWebGPU } from "../../createWebGPU.js";
@@ -37,7 +37,8 @@ export const DiagnosticsCore = webComponent(
       }px | Canvas: ${w}×${h}px | DPR: ${dpr}`;
 
       mutable.canvasInfo = info;
-      mutable[runtimeAttribute].canvas = canvas;
+      const runtimeState = mutable[runtimeAttribute];
+      runtimeState.canvas = canvas;
 
       try {
         await createWebGPU(mutable, canvas);
@@ -45,7 +46,11 @@ export const DiagnosticsCore = webComponent(
         mutable.isCompiling = false;
       }
 
-      const adapter = mutable[runtimeAttribute].adapter;
+      const adapter = runtimeState.adapter;
+      if (!adapter) {
+        console.warn("GPU adapter is not available after initialization");
+        return;
+      }
       const adapterLimits = extractLimits(adapter.limits);
       const adapterLimitsState = mutable.limits.adapter;
       for (const key of Object.keys(adapterLimitsState)) {
@@ -75,13 +80,14 @@ export const DiagnosticsCore = webComponent(
 function renderCore(params) {
   const { state, self } = params;
 
-  if (
-    state[runtimeAttribute].adapter === undefined ||
-    state[runtimeAttribute].device === undefined
-  ) {
+  if (!state) return;
+
+  const runtimeState = state[runtimeAttribute];
+  if (!runtimeState.adapter || !runtimeState.device) {
     // Send the "canvasReady" event to start initialization
-    if (!self.__canvasInitQueued) {
-      /** @type {any} */ (self).__canvasInitQueued = true;
+    const extendedSelf = /** @type {{ __canvasInitQueued?: boolean }} */ (self);
+    if (!extendedSelf.__canvasInitQueued) {
+      extendedSelf.__canvasInitQueued = true;
       queueMicrotask(() => {
         dispatchEvent(
           new CustomEvent("canvasReady", {
@@ -94,21 +100,4 @@ function renderCore(params) {
 
   // Update the slots:
   // updatePanelFooterSlot(params);
-}
-
-/**
- * @param {WebComponentRenderParams} params
- */
-function updatePanelFooterSlot({ state, makeComponent, slots }) {
-  const list = document.createElement("ol");
-  state.colors.map((c, i) => {
-    list.appendChild(
-      makeComponent(`fill-item`, {
-        // Detail is passed to the render function of the component (as .detail)
-        detail: { data: c, index: i, name: "fill-item" },
-      }),
-    );
-  });
-
-  slots["panel-footer"] = list;
 }

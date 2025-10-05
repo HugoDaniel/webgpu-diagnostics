@@ -1,37 +1,51 @@
 // @ts-check
 /** @typedef {import("../../types").UIState} UIState */
-/** @typedef {import("boredom").webComponent<UIState>} webComponent */
 /** @typedef {import("boredom").RenderFunction<UIState | undefined>} RenderFunction */
-/** @typedef {import("boredom").WebComponentRenderParams<UIState>} WebComponentRenderParams */
+/** @typedef {import("boredom").WebComponentRenderParams<UIState | undefined>} WebComponentRenderParams */
 import { webComponent } from "boredom";
 
 export const DiagnosticsGrid = webComponent(
   () => onRender,
 );
 
-/** @type RenderFunction */
+/** @type {RenderFunction} */
 function onRender(params) {
-  const { slots, state, refs } = params;
+  const { slots: rawSlots, state, refs } = /** @type {WebComponentRenderParams} */ (params);
+
+  if (!state) return;
+
+  const slots = /** @type {Record<string, HTMLElement>} */ (rawSlots);
+  const timingsTitle = /** @type {HTMLElement} */ (refs.timingsTitle);
 
   // Timings:
+  const baseTimingTitle = (() => {
+    const existing = timingsTitle.dataset.baseTitle;
+    if (existing) return existing;
+    const initial = timingsTitle.textContent ?? "";
+    timingsTitle.dataset.baseTitle = initial;
+    return initial;
+  })();
+
   if (state.isCompiling) {
-    refs.timingsTitle.classList.add("loading");
-    refs.timingsTitle.textContent += " (loading) ";
+    timingsTitle.classList.add("loading");
+    timingsTitle.textContent = `${baseTimingTitle} (loading)`;
   } else {
-    refs.timingsTitle.classList.remove("loading");
-    refs.timingsTitle.textContent = refs.timingsTitle.textContent?.replace(
-      " (loading) ",
-      "",
-    );
+    timingsTitle.classList.remove("loading");
+    timingsTitle.textContent = baseTimingTitle;
   }
   for (const [timingName, timingValue] of Object.entries(state.timings)) {
     const timingStr = state.isCompiling ? "–" : `${timingValue.toFixed(2)} ms`;
-    slots[timingName].textContent = timingStr;
+    const slot = /** @type {HTMLElement | undefined} */ (slots[timingName]);
+    if (!slot) continue;
+    slot.textContent = timingStr;
   }
 
   // Adapter Info:
-  slots.adapterInfo.textContent =
-    `Vendor: ${state.adapterInfo.vendor} | Arch: ${state.adapterInfo.architecture}`;
+  const adapterInfoSlot = /** @type {HTMLElement | undefined} */ (slots.adapterInfo);
+  if (adapterInfoSlot) {
+    adapterInfoSlot.textContent =
+      `Vendor: ${state.adapterInfo.vendor} | Arch: ${state.adapterInfo.architecture}`;
+  }
 
   // Features:
   slots.features = createFeaturesContent(state.adapterFeatures);
@@ -48,6 +62,9 @@ function onRender(params) {
   updateMessagesSection(refs.warningsCard, refs.warnings, warningMessages);
 }
 
+/**
+ * @param {[string, number | string | undefined]} entry
+ */
 function limitElement([name, value]) {
   const limitContainerElem = document.createElement("a");
   limitContainerElem.classList.add("limit");
@@ -60,7 +77,7 @@ function limitElement([name, value]) {
 
   const numElem = document.createElement("div");
   numElem.classList.add("num");
-  numElem.textContent = value;
+  numElem.textContent = value == null ? "–" : String(value);
 
   limitContainerElem.appendChild(nameElem);
   limitContainerElem.appendChild(numElem);
@@ -68,6 +85,9 @@ function limitElement([name, value]) {
   return limitContainerElem;
 }
 
+/**
+ * @param {Partial<GPUSupportedLimits>} limits
+ */
 function createLimitsContent(limits) {
   const container = document.createElement("div");
   container.classList.add("limits");
@@ -82,6 +102,9 @@ function createLimitsContent(limits) {
   return container;
 }
 
+/**
+ * @param {string[]} features
+ */
 function createFeaturesContent(features) {
   const wrapper = document.createElement("div");
   wrapper.classList.add("tags");
@@ -110,10 +133,14 @@ function createFeaturesContent(features) {
   return wrapper;
 }
 
+/**
+ * @param {UIState["errors"] | undefined} errors
+ */
 function collectErrorMessages(errors) {
   if (!errors) return [];
+  /** @type {(label: string, messages?: string[]) => string[]} */
   const normalize = (label, messages = []) =>
-    messages.map((msg) => prefixMessage(label, msg));
+    (messages ?? []).map((msg) => prefixMessage(label, msg));
   return [
     ...normalize("Adapter", errors.adapter),
     ...normalize("Device", errors.device),
@@ -123,21 +150,34 @@ function collectErrorMessages(errors) {
   ];
 }
 
+/**
+ * @param {UIState["warnings"] | undefined} warnings
+ */
 function collectWarningMessages(warnings) {
   if (!warnings) return [];
+  /** @type {(label: string, messages?: string[]) => string[]} */
   const normalize = (label, messages = []) =>
-    messages.map((msg) => prefixMessage(label, msg));
+    (messages ?? []).map((msg) => prefixMessage(label, msg));
   return [
     ...normalize("Compilation", warnings.compilation),
   ];
 }
 
+/**
+ * @param {string} label
+ * @param {unknown} msg
+ */
 function prefixMessage(label, msg) {
   const message = typeof msg === "string" ? msg : String(msg ?? "");
   if (message.startsWith("[")) return message;
   return `[${label}] ${message}`;
 }
 
+/**
+ * @param {Element | null | undefined} card
+ * @param {Element | null | undefined} container
+ * @param {string[]} messages
+ */
 function updateMessagesSection(card, container, messages) {
   if (!(container instanceof HTMLElement) || !(card instanceof HTMLElement)) {
     return;

@@ -1,8 +1,8 @@
 // @ts-check
 /** @typedef {import("../../types").UIState} UIState */
-/** @typedef {import("boredom").webComponent<UIState>} webComponent */
+/** @typedef {import("boredom").InitFunction<UIState | undefined>} InitFunction */
 /** @typedef {import("boredom").RenderFunction<UIState | undefined>} RenderFunction */
-/** @typedef {import("boredom").WebComponentRenderParams<UIState>} WebComponentRenderParams */
+/** @typedef {import("boredom").WebComponentRenderParams<UIState | undefined>} WebComponentRenderParams */
 import { webComponent } from "boredom";
 import { runtimeAttribute } from "../../runtimeAttribute.js";
 import { createWebGPU } from "../../createWebGPU.js";
@@ -10,40 +10,61 @@ import { stringSizeInKB } from "../../stringSizeInKb.js";
 
 export const ShaderConfig = webComponent(
   /** @type InitFunction */
-  ({ on, refs }) => {
+  ({ on }) => {
     on("recompile", ({ state: mutable }) => {
+      if (!mutable) return;
       mutable.isCompiling = true;
-      mutable[runtimeAttribute].device?.destroy();
+      const runtimeState = mutable[runtimeAttribute];
+      runtimeState.device?.destroy();
 
-      createWebGPU(mutable, mutable[runtimeAttribute].canvas).then(() => {
+      const canvas = runtimeState.canvas;
+      if (!(canvas instanceof HTMLCanvasElement)) {
+        console.warn("Cannot recompile shaders without a valid canvas");
         mutable.isCompiling = false;
-      });
+        return;
+      }
+
+      createWebGPU(mutable, canvas)
+        .catch((error) => {
+          console.error("Recompile failed", error);
+        })
+        .finally(() => {
+          mutable.isCompiling = false;
+        });
     });
 
     on("showCode", ({ state: mutable }) => {
+      if (!mutable) return;
       mutable.showShaderCode = !mutable.showShaderCode;
     });
 
-    on(
-      "tab1Change",
-      ({ state: mutable }) => mutable.selectedShader = "compute",
-    );
-    on("tab2Change", ({ state: mutable }) => mutable.selectedShader = "vertex");
-    on(
-      "tab3Change",
-      ({ state: mutable }) => mutable.selectedShader = "fragment",
-    );
+    on("tab1Change", ({ state: mutable }) => {
+      if (!mutable) return;
+      mutable.selectedShader = "compute";
+    });
+    on("tab2Change", ({ state: mutable }) => {
+      if (!mutable) return;
+      mutable.selectedShader = "vertex";
+    });
+    on("tab3Change", ({ state: mutable }) => {
+      if (!mutable) return;
+      mutable.selectedShader = "fragment";
+    });
 
     return onRender;
   },
 );
 
-/** @type RenderFunction */
+/** @type {RenderFunction} */
 function onRender(params) {
-  const { slots, makeComponent, state, self, refs } = params;
+  const { slots: rawSlots, makeComponent, state, refs } =
+    /** @type {WebComponentRenderParams} */ (params);
   if (!state) return;
 
-  if (slots.panels.childElementCount === 0) {
+  const slots = /** @type {Record<string, HTMLElement>} */ (rawSlots);
+
+  const panelsContainer = /** @type {HTMLElement} */ (slots.panels);
+  if (panelsContainer.childElementCount === 0) {
     const panels = [
       makeComponent("sliders-panel", {
         detail: { data: "compute", index: 0, name: "shader-config-panel" },
@@ -59,7 +80,7 @@ function onRender(params) {
       panel.classList.add("tab-panel");
       return panel;
     });
-    slots.panels.replaceChildren(...panels);
+    panelsContainer.replaceChildren(...panels);
   }
 
   const sizeCompute = stringSizeInKB(state.shaders.compute);
@@ -92,7 +113,8 @@ function onRender(params) {
     codeToggleButton instanceof HTMLButtonElement &&
     codeBlock instanceof HTMLElement
   ) {
-    const currentShader = state.shaders[state.selectedShader] ?? "";
+    const key = state.selectedShader;
+    const currentShader = state.shaders[key] ?? "";
     const scopeLabel = state.selectedShader
       ? state.selectedShader.charAt(0).toUpperCase() +
         state.selectedShader.slice(1)
@@ -116,6 +138,10 @@ function onRender(params) {
 const SIZE_SMALL_THRESHOLD = 1024; // KB
 const SIZE_MEDIUM_THRESHOLD = 4096; // KB
 
+/**
+ * @param {number} sizeInKb
+ * @param {string} formattedText
+ */
 function createSizeBadge(sizeInKb, formattedText) {
   const badge = document.createElement("span");
   badge.classList.add("shader-size");
