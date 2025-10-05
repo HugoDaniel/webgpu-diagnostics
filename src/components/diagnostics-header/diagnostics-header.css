@@ -47,4 +47,12 @@
   .badge.bad .dot{
     background:var(--bad);
   }
+
+  .stars {
+    display: flex;
+    a {
+      display: flex;
+      align-items: center;
+    }
+  }
 }
