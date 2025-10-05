@@ -48,9 +48,14 @@
     background:var(--bad);
   }
 
+  .webgpu-info {
+    display: flex;
+  }
+
   .stars {
     display: flex;
     a {
+      margin-left: 16px;
       display: flex;
       align-items: center;
     }

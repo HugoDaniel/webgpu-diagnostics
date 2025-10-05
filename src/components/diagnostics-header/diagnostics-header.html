@@ -1,16 +1,19 @@
 <template data-component="diagnostics-header">
   <div class="wrap titlebar">
     <h1>WebGPU Diagnostics</h1>
-    <div id="status" class="badge" data-ref="badge">
-      <span class="dot"></span>
-      <slot name="statusText">
-        Initializing...
-      </slot>
-    </div>
-    <div class="stars">
-      <a href="https://github.com/HugoDaniel/webgpu-diagnostics">
-        <img src="https://img.shields.io/github/stars/HugoDaniel/webgpu-diagnostics?style=social" alt="GitHub stars">
-      </a>
+    <div class="webgpu-info">
+      <div id="status" class="badge" data-ref="badge">
+        <span class="dot"></span>
+        <slot name="statusText">
+          Initializing...
+        </slot>
+      </div>
+      <div class="stars">
+        <a href="https://github.com/HugoDaniel/webgpu-diagnostics">
+          GitHub
+          <!-- <img src="https://img.shields.io/github/stars/HugoDaniel/webgpu-diagnostics?style=social" alt="GitHub stars"> -->
+        </a>
+      </div>
     </div>
   </div>
 </template>
